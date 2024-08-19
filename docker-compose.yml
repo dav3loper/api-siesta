@@ -2,9 +2,9 @@ version: "3.8"
 
 services:
     php:
-        build: ./docker/php
+        build: .
         volumes:
-            - ./app:/var/www/html
+            - .:/var/www/html
  
     db:
         image: mysql:8.0.33
