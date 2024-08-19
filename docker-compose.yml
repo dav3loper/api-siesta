@@ -1,0 +1,16 @@
+version: "3.8"
+
+services:
+    php:
+        build: ./docker/php
+        volumes:
+            - ./app:/var/www/html
+ 
+    db:
+        image: mysql:8.0.33
+        environment:
+            MYSQL_ROOT_PASSWORD: secret
+            MYSQL_DATABASE: symfony
+            MYSQL_USER: symfony
+            MYSQL_PASSWORD: secret
+
