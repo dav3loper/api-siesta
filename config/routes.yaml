@@ -1,5 +1,4 @@
-controllers:
-    resource:
-        path: ../src/Controller/
-        namespace: App\Controller
-    type: attribute
+get-movie:
+    path: /movie/{id}
+    controller: Siesta\App\Action\GetMovieByIdAction
+    methods: GET
