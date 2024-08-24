@@ -10,6 +10,7 @@
 ###< symfony/framework-bundle ###
 .idea
 Makefile
+docker/db/
 
 ###> phpunit/phpunit ###
 /phpunit.xml

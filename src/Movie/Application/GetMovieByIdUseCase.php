@@ -3,23 +3,20 @@
 namespace Siesta\Movie\Application;
 
 use Siesta\Movie\Domain\MovieRepository;
-use Siesta\Movie\Domain\VoteRepository;
 
 class GetMovieByIdUseCase
 {
 
     public function __construct(
-        private readonly MovieRepository $movieRepository,
-        private readonly VoteRepository $voteRepository)
+        private readonly MovieRepository $movieRepository)
     {
     }
 
     public function execute(mixed $id)
     {
-        $movie = $this->movieRepository->getById($id);
-        $voteForMovie = $this->voteRepository->getAllByMovieId($movie->id);
+        $movieWithVotes = $this->movieRepository->getById($id);
 
-        return new MovieWithVotesResponse($movie, $voteForMovie);
+        return new MovieResponse($movieWithVotes);
 
     }
 }
