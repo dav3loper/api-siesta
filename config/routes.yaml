@@ -2,3 +2,8 @@ get-movie:
     path: /movie/{id}
     controller: Siesta\App\Action\Movie\GetMovieByIdAction
     methods: GET
+
+get-votes-for-movie:
+    path: /movie/{movieId}/votes
+    controller: Siesta\App\Action\Vote\GetVotesForMovieAction
+    methods: GET

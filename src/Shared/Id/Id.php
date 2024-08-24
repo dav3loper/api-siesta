@@ -8,4 +8,8 @@ class Id
     {
     }
 
+    public function __toString(): string
+    {
+        return $this->id;
+    }
 }

@@ -2,11 +2,11 @@
 
 namespace Siesta\Tests\Fixtures\Movie;
 
-use Siesta\Movie\Domain\Vote;
-use Siesta\Movie\Domain\VoteCollection;
 use Siesta\Shared\Id\Id;
 use Siesta\Shared\Score\Score;
 use Siesta\Tests\Fixtures\Mother;
+use Siesta\Vote\Domain\Vote;
+use Siesta\Vote\Domain\VoteCollection;
 
 class VoteMother extends Mother
 {
