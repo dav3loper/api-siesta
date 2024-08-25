@@ -1,6 +1,6 @@
 <?php
 
-namespace Siesta\Movie\Domain;
+namespace Siesta\Vote\Domain;
 
 use Siesta\Shared\Collection\Collection;
 

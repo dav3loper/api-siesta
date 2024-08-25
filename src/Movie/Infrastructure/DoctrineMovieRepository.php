@@ -55,31 +55,4 @@ class DoctrineMovieRepository implements MovieRepository
         );
 
     }
-
-    /**
-     * @throws DataNotFound
-     * @throws InternalError
-     */
-    private function getVotesForMovie(string $id): array
-    {
-        try {
-            $data = $this->connection->createQueryBuilder()
-                ->select('*')
-                ->from('vote')
-                ->where('movie_id=:id')
-                ->setParameter('id', $id)
-                ->fetchAllAssociative();
-        } catch (Throwable $e) {
-            throw new InternalError($e->getMessage());
-        }
-        if (empty($data)) {
-            return [];
-        }
-        return $this->fromDataToVoteList($data);
-    }
-
-    private function fromDataToVoteList(array $data)
-    {
-
-    }
 }

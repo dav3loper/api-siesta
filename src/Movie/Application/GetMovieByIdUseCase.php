@@ -12,7 +12,7 @@ class GetMovieByIdUseCase
     {
     }
 
-    public function execute(mixed $id)
+    public function execute(mixed $id): MovieResponse
     {
         $movieWithVotes = $this->movieRepository->getById($id);
 
