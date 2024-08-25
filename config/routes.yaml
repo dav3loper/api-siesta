@@ -7,3 +7,7 @@ get-votes-for-movie:
     path: /movie/{movieId}/votes
     controller: Siesta\App\Action\Vote\GetVotesForMovieAction
     methods: GET
+vote-for-movie:
+    path: /movie/{movieId}/vote
+    controller: Siesta\App\Action\Vote\VoteForMovieAction
+    methods: POST

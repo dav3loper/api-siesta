@@ -12,4 +12,6 @@ interface VoteRepository
      * @throws InternalError
      */
     public function getAllByMovieId(Id $id): VoteCollection;
+
+    public function upsert(Vote $vote): void;
 }

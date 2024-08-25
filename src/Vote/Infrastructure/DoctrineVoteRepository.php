@@ -3,6 +3,7 @@
 namespace Siesta\Vote\Infrastructure;
 
 use Doctrine\DBAL\Connection;
+use Siesta\Shared\Date\Date;
 use Siesta\Shared\Exception\InternalError;
 use Siesta\Shared\Id\Id;
 use Siesta\Shared\Score\Score;
@@ -47,5 +48,33 @@ class DoctrineVoteRepository implements VoteRepository
 
         }
         return $voteCollection;
+    }
+
+    public function upsert(Vote $vote): void
+    {
+        $exitingVote = $this->connection->createQueryBuilder()
+            ->select('id')
+            ->from('vote')
+            ->where('user_id=:userId')
+            ->andWhere('movie_id=:movieId')
+            ->setParameter('userId', $vote->userId)
+            ->setParameter('movieId', $vote->movieId)
+            ->fetchOne();
+        if ($exitingVote) {
+            $this->connection->update('vote', [
+                'score' => $vote->score->value,
+                'updated_at' => new Date('now')
+            ]);
+            return;
+        }
+
+        $this->connection->insert('vote', [
+            'user_id' => $vote->userId,
+            'movie_id' => $vote->movieId,
+            'score' => $vote->score->value,
+            'created_at' => new Date('now'),
+            'updated_at' => new Date('now')
+        ]);
+
     }
 }
