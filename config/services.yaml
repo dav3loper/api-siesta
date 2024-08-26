@@ -27,4 +27,11 @@ services:
         arguments:
             $secretKey: '%env(JWT_SECRET_KEY)%'
             $algorithm: '%env(JWT_ALGORITHM)%'
+    Siesta\App\Listener\JwtChecker:
+        arguments:
+            $routes :
+                - '/login'
+        tags:
+            - { name: kernel.event_listener, event: kernel.request }
+
 
