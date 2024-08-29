@@ -14,4 +14,6 @@ interface VoteRepository
     public function getAllByMovieId(Id $id, ?Id $groupId): VoteCollection;
 
     public function upsert(Vote $vote): void;
+
+    public function getLastVotedMovieForUserAndFilmFestival(Id $userId, Id $filmFestivalId): Vote;
 }

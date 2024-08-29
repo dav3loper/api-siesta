@@ -1,6 +1,6 @@
 <?php
 
-namespace Siesta\Vote\Application;
+namespace Siesta\Vote\Application\Vote;
 
 use Siesta\Shared\Id\Id;
 use Siesta\Shared\Score\Score;

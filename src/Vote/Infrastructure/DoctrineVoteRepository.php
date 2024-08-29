@@ -45,11 +45,7 @@ class DoctrineVoteRepository implements VoteRepository
     {
         $voteCollection = new VoteCollection([]);
         foreach ($data as $dataOfVote) {
-            $voteCollection->add(new Vote(
-                new Id($dataOfVote['user_id']),
-                Score::from((int)$dataOfVote['score']),
-                new Id($dataOfVote['movie_id']),
-            ));
+            $voteCollection->add($this->fromDataToVote($dataOfVote));
 
         }
         return $voteCollection;
@@ -81,5 +77,37 @@ class DoctrineVoteRepository implements VoteRepository
             'updated_at' => new Date('now')
         ]);
 
+    }
+
+    public function getLastVotedMovieForUserAndFilmFestival(Id $userId, Id $filmFestivalId): Vote
+    {
+        try {
+            $data = $this->connection->createQueryBuilder()
+                ->select('*')
+                ->from('vote', 'v')
+                ->innerJoin('v', 'movie', 'm', 'm.id = v.movie_id')
+                ->where('m.film_festival_id=:id')
+                ->andWhere('v.user_id=:userId')
+                ->setParameter('id', $filmFestivalId)
+                ->setParameter('userId', $userId)
+                ->orderBy('m.id', 'DESC')
+                ->fetchAssociative();
+        } catch (Throwable $e) {
+            throw new InternalError($e->getMessage());
+        }
+        return $this->fromDataToVote($data);
+    }
+
+    /**
+     * @param mixed $dataOfVote
+     * @return Vote
+     */
+    public function fromDataToVote(mixed $dataOfVote): Vote
+    {
+        return new Vote(
+            new Id($dataOfVote['user_id']),
+            Score::from((int)$dataOfVote['score']),
+            new Id($dataOfVote['movie_id']),
+        );
     }
 }

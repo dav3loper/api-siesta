@@ -1,8 +1,8 @@
 <?php
 
-namespace Siesta\Vote\Application;
+namespace Siesta\Vote\Application\LastVoted;
 
-use Siesta\Shared\Id\Id;
+use Siesta\Vote\Application\GetVotes\VoteResponse;
 use Siesta\Vote\Domain\VoteRepository;
 
 class GetVotesForMovieByGroupUseCase

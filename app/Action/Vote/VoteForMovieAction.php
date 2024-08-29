@@ -3,9 +3,8 @@
 namespace Siesta\App\Action\Vote;
 
 use Siesta\App\Action\BaseAction;
-use Siesta\Movie\Domain\Movie;
-use Siesta\Vote\Application\VoteForMovieUseCase;
-use Siesta\Vote\Application\VoteRequest;
+use Siesta\Vote\Application\Vote\VoteForMovieUseCase;
+use Siesta\Vote\Application\Vote\VoteRequest;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

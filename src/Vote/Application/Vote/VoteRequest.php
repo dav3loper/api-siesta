@@ -1,6 +1,6 @@
 <?php
 
-namespace Siesta\Vote\Application;
+namespace Siesta\Vote\Application\Vote;
 
 class VoteRequest
 {

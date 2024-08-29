@@ -1,6 +1,6 @@
 <?php
 
-namespace Siesta\Vote\Application;
+namespace Siesta\Vote\Application\GetVotes;
 
 use Siesta\Vote\Domain\Vote;
 use Siesta\Vote\Domain\VoteCollection;

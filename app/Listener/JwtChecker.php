@@ -21,12 +21,12 @@ class JwtChecker
         $request = $event->getRequest();
         $partialUri = $request->getRequestUri();
         $needsAuthorization = !in_array($partialUri, $this->routes);
-        if(!$needsAuthorization){
+        if (!$needsAuthorization || !$event->isMainRequest()) {
             return;
         }
         //TODO: cambiar por try/catch
         $authToken = $this->getHeaderAuthorization($request);
-        if ($event->isMainRequest() && $authToken) {
+        if ($authToken) {
             $params = $this->decodeToken($authToken);
             $request->headers->add($params);
         } else {
@@ -35,10 +35,11 @@ class JwtChecker
 
 
     }
+
     private function getHeaderAuthorization(Request $request): string
     {
         $authorization = $request->headers->get('authorization');
-        if(empty($authorization) || !str_contains($authorization, 'Bearer')){
+        if (empty($authorization) || !str_contains($authorization, 'Bearer')) {
             return '';
         }
 
@@ -49,7 +50,7 @@ class JwtChecker
     private function decodeToken(string $token): array
     {
         $parameters = $this->tokenService->decode($token);
-        return json_decode((string) json_encode($parameters), true);
+        return json_decode((string)json_encode($parameters), true);
     }
 
 }
