@@ -5,7 +5,7 @@ namespace Siesta\Vote\Application;
 use Siesta\Shared\Id\Id;
 use Siesta\Vote\Domain\VoteRepository;
 
-class GetVotesForMovieUseCase
+class GetVotesForMovieByGroupUseCase
 {
 
 
@@ -13,9 +13,9 @@ class GetVotesForMovieUseCase
     {
     }
 
-    public function execute(Id $id): VoteResponse
+    public function execute(GetVotesForMovieRequest $request): VoteResponse
     {
-        $voteListCollection = $this->voteRepository->getAllByMovieId($id);
+        $voteListCollection = $this->voteRepository->getAllByMovieId($request->movieId, $request->groupId);
 
         return new VoteResponse($voteListCollection);
 

@@ -17,7 +17,7 @@ class Movie
         public readonly int    $duration,
         public readonly string $summary,
         public readonly ?string $link,
-        public readonly string $comments,
+        public readonly ?string $comments,
         public readonly int    $film_festival_id,
         public readonly ?string $alias,
     )

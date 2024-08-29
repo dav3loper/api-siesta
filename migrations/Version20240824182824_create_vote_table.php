@@ -22,6 +22,7 @@ final class Version20240824182824_create_vote_table extends AbstractMigration
         $table = $schema->createTable('vote');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('user_id', 'integer', ['notnull' => true]);
+        $table->addColumn('group_id', 'integer', ['notnull' => false]);
         $table->addColumn('movie_id', 'integer', ['notnull' => true]);
         $table->addColumn('score', 'integer', ['notnull' => true]);
         $table->addColumn('created_at', 'datetime', ['notnull' => true]);

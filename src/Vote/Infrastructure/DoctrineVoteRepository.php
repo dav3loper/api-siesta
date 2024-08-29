@@ -21,15 +21,20 @@ class DoctrineVoteRepository implements VoteRepository
     /**
      * @throws InternalError
      */
-    public function getAllByMovieId(Id $id): VoteCollection
+    public function getAllByMovieId(Id $id, ?Id $groupId): VoteCollection
     {
         try {
-            $data = $this->connection->createQueryBuilder()
+            $query = $this->connection->createQueryBuilder()
                 ->select('*')
                 ->from('vote')
                 ->where('movie_id=:id')
                 ->setParameter('id', $id)
-                ->fetchAllAssociative();
+                ->setParameter('groupId', $groupId);
+            if ($groupId) {
+                $query = $query->andWhere('group_id=:groupId')
+                    ->setParameter('groupId', $groupId);
+            }
+            $data = $query->fetchAllAssociative();
         } catch (Throwable $e) {
             throw new InternalError($e->getMessage());
         }
@@ -41,7 +46,7 @@ class DoctrineVoteRepository implements VoteRepository
         $voteCollection = new VoteCollection([]);
         foreach ($data as $dataOfVote) {
             $voteCollection->add(new Vote(
-                new Id($dataOfVote['id']),
+                new Id($dataOfVote['user_id']),
                 Score::from((int)$dataOfVote['score']),
                 new Id($dataOfVote['movie_id']),
             ));

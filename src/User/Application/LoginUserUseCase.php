@@ -69,6 +69,7 @@ class LoginUserUseCase
             'user_id' => $user->id->id,
             'user_name' => $user->name,
             'group_id' => $user->group->id->id,
+            'group_name' => $user->group->name
         ]);
 
     }

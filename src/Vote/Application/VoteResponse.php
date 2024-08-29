@@ -17,9 +17,9 @@ class VoteResponse implements \JsonSerializable
         return [
             "votes" => array_map(fn(Vote $vote) =>
                 [
-                    "user_id" => $vote->userId,
-                    "movie_id" => $vote->movieId,
-                    "score" => $vote->score,
+                    "user_id" => $vote->userId->id,
+                    "movie_id" => $vote->movieId->id,
+                    "score" => $vote->score->value,
                 ]
             , $this->voteCollection->items())
         ];
