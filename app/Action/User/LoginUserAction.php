@@ -6,6 +6,7 @@ use Siesta\App\Action\BaseAction;
 use Siesta\Shared\ValueObject\Email;
 use Siesta\Shared\ValueObject\Password;
 use Siesta\User\Application\LoginUserUseCase;
+use Siesta\User\Domain\InvalidLoginData;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -22,14 +23,18 @@ class LoginUserAction extends BaseAction
 
     public function __invoke(Request $request): Response
     {
-        $loginData = $this->getParameters($request);
+        try {
+            $loginData = $this->getParameters($request);
 
-        $token = $this->loginUserUseCase->execute(
-            new Email($loginData['email']), Password::clear($loginData['password'])
-        );
-        return new JsonResponse([
-           'token' => $token,
-        ]);
+            $token = $this->loginUserUseCase->execute(
+                new Email($loginData['email']), Password::clear($loginData['password'])
+            );
+            return new JsonResponse([
+                'token' => $token,
+            ]);
+        }catch (InvalidLoginData){
+            return new JsonResponse('Invalid login data', 403);
+        }
     }
 
     private function getParameters(Request $request): array
