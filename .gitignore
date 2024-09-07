@@ -17,3 +17,4 @@ docker/db/
 /phpunit.xml
 .phpunit.result.cache
 ###< phpunit/phpunit ###
+.htaccess
