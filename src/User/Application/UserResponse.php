@@ -19,11 +19,9 @@ class UserResponse implements \JsonSerializable
         $userDataList = array_map(fn(User $user) => ['name' => $user->name, 'id' => $user->id->id], $this->userCollection->items());
         $groupName = $this->userCollection->items()[0]->group->name;
         return [
-            'group' => [
-                'id' => $this->groupId->id,
-                'name' => $groupName,
-                'user_list' => $userDataList
-            ]
+            'id' => $this->groupId->id,
+            'name' => $groupName,
+            'user_list' => $userDataList
         ];
     }
 }
