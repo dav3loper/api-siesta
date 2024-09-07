@@ -5,6 +5,7 @@ namespace Siesta\User\Domain;
 use Siesta\Shared\Exception\DataNotFound;
 use Siesta\Shared\Exception\InternalError;
 use Siesta\Shared\Exception\ValueNotValid;
+use Siesta\Shared\Id\Id;
 use Siesta\Shared\ValueObject\Email;
 
 interface UserRepository
@@ -15,4 +16,6 @@ interface UserRepository
      * @throws InternalError
      */
     public function findByEmail(Email $email): User;
+
+    public function findByGroupId(Id $groupId): UserCollection;
 }

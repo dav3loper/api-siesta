@@ -21,3 +21,8 @@ login-user:
     path: /login
     controller: Siesta\App\Action\User\LoginUserAction
     methods: POST
+
+users-from-group:
+    path: /group/{groupId}
+    controller: Siesta\App\Action\User\UserListFromGroupAction
+    methods: GET
