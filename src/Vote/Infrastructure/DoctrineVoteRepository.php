@@ -73,6 +73,7 @@ class DoctrineVoteRepository implements VoteRepository
             'user_id' => $vote->userId,
             'movie_id' => $vote->movieId,
             'score' => $vote->score->value,
+            'group_id' => $vote->groupId,
             'created_at' => new Date('now'),
             'updated_at' => new Date('now')
         ]);

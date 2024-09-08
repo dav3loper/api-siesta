@@ -10,7 +10,8 @@ class Vote
     public function __construct(
         public readonly Id $userId,
         public readonly Score $score,
-        public readonly Id $movieId
+        public readonly Id $movieId,
+        public readonly ?Id $groupId
     )
     {
     }

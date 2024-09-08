@@ -17,13 +17,21 @@ class VoteForMovieAction extends BaseAction
 
     public function __invoke(Request $request, string $movieId): Response
     {
-        $voteData = $request->toArray();
-        $voteRequest = new VoteRequest(
-          $voteData['user_id'],
-          $movieId,
-          $voteData['score'] ?? null
-        );
-        $this->voteForMovieUseCase->execute($voteRequest);
+        $voteDataList = $request->toArray();
+        $groupId = $request->headers->get('Group-Id');
+
+
+        array_map(function ($voteData) use ($movieId, $groupId) {
+            $voteRequest = new VoteRequest(
+                $voteData['user_id'],
+                $movieId,
+                $voteData['score'] ?? null,
+                $groupId ?? null
+            );
+            $this->voteForMovieUseCase->execute($voteRequest);
+
+        }, $voteDataList);
+
         return new JsonResponse([], Response::HTTP_CREATED);
     }
 

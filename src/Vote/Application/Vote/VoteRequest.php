@@ -8,6 +8,7 @@ class VoteRequest
         public readonly string $userId,
         public readonly string $movieId,
         public readonly ?int $score,
+        public readonly ?int $groupId,
     )
     {
     }

@@ -17,8 +17,9 @@ class VoteForMovieUseCase
     {
         $vote = new Vote(
             new Id($voteRequest->userId),
-            $voteRequest->score ? Score::from($voteRequest->score) : Score::NOT_YET,
+            $voteRequest->score !== null ? Score::from($voteRequest->score) : Score::NOT_YET,
             new Id($voteRequest->movieId),
+            $voteRequest->groupId ? new Id($voteRequest->groupId) : null,
         );
         $this->voteRepository->upsert($vote);
     }
