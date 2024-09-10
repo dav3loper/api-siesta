@@ -37,4 +37,13 @@ services:
         tags:
             - { name: kernel.event_listener, event: kernel.exception }
 
+    Google\Client:
+        arguments:
+            $config:
+                application_name: '%env(GOOGLE_APP_NAME)%'
+                developer_key: '%env(GOOGLE_APP_KEY)%'
+
+    Google\Service\YouTube:
+        arguments:
+            $clientOrConfig: '@Google\Client'
 

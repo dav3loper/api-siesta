@@ -2,6 +2,7 @@
 
 namespace Siesta\App\Command;
 
+use Siesta\Extraction\Domain\FinderVideoService;
 use Siesta\Extraction\Domain\Movie;
 use Siesta\Extraction\Domain\MovieRepository;
 use Symfony\Component\Console\Command\Command;
@@ -16,6 +17,7 @@ class ObtainMoviesFromJsonCommand extends Command
 
     public function __construct(
         private readonly MovieRepository $movieRepository,
+        private readonly FinderVideoService $finderVideoService,
     )
     {
         parent::__construct();
@@ -42,7 +44,7 @@ class ObtainMoviesFromJsonCommand extends Command
             $movieList[] = new Movie(
                 $movieData['international_title'],
                 $movieData['image'],
-                'notrailer',
+                $this->getTrailer($movieData['original_title']),
                 $movieData['duration'],
                 $movieData['synopsis']['es'],
                 self::HOST.$movieData['url']['es'],
@@ -52,5 +54,16 @@ class ObtainMoviesFromJsonCommand extends Command
         array_map(fn(Movie $movie) => $this->movieRepository->store($movie), $movieList);
 
         return self::SUCCESS;
+    }
+
+    private function getTrailer(string $title): string
+    {
+        try {
+            $result = $this->finderVideoService->findByText("lord of the rings official trailer");
+            return $result;
+        }catch (\Throwable $e){
+            echo $e->getMessage();
+        }
+
     }
 }

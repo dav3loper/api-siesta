@@ -12,6 +12,7 @@
         "doctrine/doctrine-migrations-bundle": "^3.3",
         "doctrine/orm": "^3.2",
         "firebase/php-jwt": "^6.10",
+        "google/apiclient": "*",
         "nelmio/cors-bundle": "^2.5",
         "symfony/console": "7.1.*",
         "symfony/dotenv": "7.1.*",
@@ -63,7 +64,8 @@
         ],
         "post-update-cmd": [
             "@auto-scripts"
-        ]
+        ],
+        "pre-autoload-dump": "Google\\Task\\Composer::cleanup"
     },
     "conflict": {
         "symfony/symfony": "*"
@@ -72,6 +74,9 @@
         "symfony": {
             "allow-contrib": false,
             "require": "7.1.*"
-        }
+        },
+        "google/apiclient-services": [
+            "YouTube"
+        ]
     }
 }
