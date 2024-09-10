@@ -13,8 +13,8 @@ vote-for-movie:
     methods: POST
 
 last-movie-voted-for-user:
-    path: /film-festival/{filmFestivalId}/last-voted
-    controller: Siesta\App\Action\Vote\GetLastMovieVotedAction
+    path: /film-festival/{filmFestivalId}/next
+    controller: Siesta\App\Action\Vote\GetNextMovieToVoteAction
     methods: GET
 
 login-user:

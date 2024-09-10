@@ -4,7 +4,7 @@ namespace Siesta\Vote\Application\LastVoted;
 
 use Siesta\Shared\Id\Id;
 
-class LastMovieVotedResponse
+class NextMovieToVoteResponse
 {
 
     public function __construct(public readonly Id $movie)

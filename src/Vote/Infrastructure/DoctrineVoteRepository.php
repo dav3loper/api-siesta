@@ -4,6 +4,7 @@ namespace Siesta\Vote\Infrastructure;
 
 use Doctrine\DBAL\Connection;
 use Siesta\Shared\Date\Date;
+use Siesta\Shared\Exception\DataNotFound;
 use Siesta\Shared\Exception\InternalError;
 use Siesta\Shared\Id\Id;
 use Siesta\Shared\Score\Score;
@@ -80,6 +81,10 @@ class DoctrineVoteRepository implements VoteRepository
 
     }
 
+    /**
+     * @throws DataNotFound
+     * @throws InternalError
+     */
     public function getLastVotedMovieForUserAndFilmFestival(Id $userId, Id $filmFestivalId): Vote
     {
         try {
@@ -96,6 +101,9 @@ class DoctrineVoteRepository implements VoteRepository
         } catch (Throwable $e) {
             throw new InternalError($e->getMessage());
         }
+        if (empty($data)) {
+            throw new DataNotFound("No movies voted");
+        }
         return $this->fromDataToVote($data);
     }
 
@@ -109,6 +117,7 @@ class DoctrineVoteRepository implements VoteRepository
             new Id($dataOfVote['user_id']),
             Score::from((int)$dataOfVote['score']),
             new Id($dataOfVote['movie_id']),
+            new Id($dataOfVote['group_id']),
         );
     }
 }

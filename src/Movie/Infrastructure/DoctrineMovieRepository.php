@@ -55,4 +55,29 @@ class DoctrineMovieRepository implements MovieRepository
         );
 
     }
+
+    /**
+     * @throws DataNotFound
+     * @throws InternalError
+     */
+    public function getNextMovie(Id $movieId, Id $filmFestivalId): Movie
+    {
+        try {
+            $data = $this->connection->createQueryBuilder()
+                ->select('*')
+                ->from('movie')
+                ->where('id>:id')
+                ->andWhere('film_festival_id=:film_festival_id')
+                ->setParameter('id', $movieId)
+                ->setParameter('film_festival_id', $filmFestivalId)
+                ->orderBy("id ASC")
+                ->fetchAssociative();
+        } catch (Throwable $e) {
+            throw new InternalError($e->getMessage());
+        }
+        if (empty($data)) {
+            throw new DataNotFound("No more movies left");
+        }
+        return $this->fromDataToMovie($data);
+    }
 }
