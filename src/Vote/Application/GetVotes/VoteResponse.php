@@ -19,7 +19,7 @@ class VoteResponse implements \JsonSerializable
                 [
                     "user_id" => $vote->userId->id,
                     "movie_id" => $vote->movieId->id,
-                    "score" => $vote->score->value,
+                    "score" => (string)$vote->score->value,
                 ]
             , $this->voteCollection->items())
         ];

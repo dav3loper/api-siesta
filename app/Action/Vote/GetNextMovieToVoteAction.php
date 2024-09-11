@@ -23,7 +23,7 @@ class GetNextMovieToVoteAction extends BaseAction
         $request = new GetNextMovieToVoteUseCaseRequest(new Id($filmFestivalId), new Id($userId));
         $response = $this->useCase->execute($request);
 
-        return new JsonResponse($response);
+        return new JsonResponse(['id'=>$response->movie->id]);
 
     }
 

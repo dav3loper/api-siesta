@@ -66,6 +66,8 @@ class DoctrineVoteRepository implements VoteRepository
             $this->connection->update('vote', [
                 'score' => $vote->score->value,
                 'updated_at' => new Date('now')
+            ], [
+                'id' => $exitingVote
             ]);
             return;
         }
