@@ -80,4 +80,25 @@ class DoctrineMovieRepository implements MovieRepository
         }
         return $this->fromDataToMovie($data);
     }
+
+    /**
+     * @return Movie[]
+     * @throws InternalError
+     */
+    public function getAllByFilmFestivalId(int $filmFestivalId): array
+    {
+        try {
+            $dataList = $this->connection->createQueryBuilder()
+                ->select('*')
+                ->from('movie')
+                ->where('film_festival_id=:id')
+                ->setParameter('id', $filmFestivalId)
+                ->fetchAllAssociative();
+        } catch (Throwable $e) {
+            throw new InternalError($e->getMessage());
+        }
+
+
+        return array_map(fn($data) => $this->fromDataToMovie($data), $dataList);
+    }
 }

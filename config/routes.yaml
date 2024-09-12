@@ -17,6 +17,11 @@ last-movie-voted-for-user:
     controller: Siesta\App\Action\Vote\GetNextMovieToVoteAction
     methods: GET
 
+all-movies-of-film-festival:
+    path: /film-festival/{filmFestivalId}/movies
+    controller: Siesta\App\Action\Movie\GetAllMoviesAction
+    methods: GET
+
 login-user:
     path: /login
     controller: Siesta\App\Action\User\LoginUserAction

@@ -16,4 +16,6 @@ interface MovieRepository
      * @throws InternalError
      */
     public function getNextMovie(Id $movieId, Id $filmFestivalId): Movie;
+
+    public function getAllByFilmFestivalId(int $filmFestivalId);
 }
