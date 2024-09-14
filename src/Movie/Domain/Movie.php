@@ -26,6 +26,7 @@ class Movie implements \JsonSerializable
         public readonly array   $sessions
     )
     {
+        $this->voteCollection = new VoteCollection([]);
     }
 
     public function setVoteCollection(VoteCollection $voteCollection): void
