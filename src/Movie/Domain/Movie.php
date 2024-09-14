@@ -20,6 +20,8 @@ class Movie
         public readonly ?string $comments,
         public readonly int    $film_festival_id,
         public readonly ?string $alias,
+        public readonly ?string $section,
+        public readonly array $sessions
     )
     {
     }

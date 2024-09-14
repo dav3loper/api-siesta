@@ -10,6 +10,7 @@ use Siesta\Shared\Date\Date;
 class DoctrineMovieRepository implements MovieRepository
 {
     const TABLE = 'movie';
+    const SESSIONS_TABLE = 'sessions';
 
     public function __construct(private Connection $connection)
     {
@@ -30,6 +31,7 @@ class DoctrineMovieRepository implements MovieRepository
                 'duration' => $movie->duration,
                 'summary' => $movie->summary,
                 'link' => $movie->link,
+                'section' => $movie->section,
                 'updated_at' => new Date('now')
             ], ['id' => $wasAlreadyStored]);
             return;
@@ -43,8 +45,18 @@ class DoctrineMovieRepository implements MovieRepository
             'summary' => $movie->summary,
             'link' => $movie->link,
             'film_festival_id' => $movie->film_festival_id,
+            'section' => $movie->section,
             'created_at' => new Date('now'),
             'updated_at' => new Date('now')
         ]);
+        $movieId = $this->connection->lastInsertId();
+        array_map(fn(array $session) =>
+            $this->connection->insert(self::SESSIONS_TABLE, [
+                'movie_id' => $movieId,
+                'location' => $session['location'],
+                'init_date' => $session['init_date'],
+                'end_date' => $session['end_date'],
+            ]), $movie->sessions);
+        exit;
     }
 }

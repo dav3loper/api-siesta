@@ -3,7 +3,6 @@
 namespace Siesta\Extraction\Infrastructure;
 
 use Exception;
-use Google\Client;
 use Google\Service\YouTube;
 use Google\Service\YouTube\SearchResult;
 use Siesta\Extraction\Domain\FinderVideoService;

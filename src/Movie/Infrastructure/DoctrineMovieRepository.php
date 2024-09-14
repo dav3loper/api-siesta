@@ -5,6 +5,8 @@ namespace Siesta\Movie\Infrastructure;
 use Doctrine\DBAL\Connection;
 use Siesta\Movie\Domain\Movie;
 use Siesta\Movie\Domain\MovieRepository;
+use Siesta\Movie\Domain\Session;
+use Siesta\Shared\Date\Date;
 use Siesta\Shared\Exception\DataNotFound;
 use Siesta\Shared\Exception\InternalError;
 use Siesta\Shared\Id\Id;
@@ -36,11 +38,18 @@ class DoctrineMovieRepository implements MovieRepository
         if (empty($data)) {
             throw new DataNotFound("Movie with $id not found");
         }
-        return $this->fromDataToMovie($data);
+        $sessionsData = $this->connection->createQueryBuilder()
+            ->select('*')
+            ->from('sessions')
+            ->where('movie_id=:movie_id')
+            ->setParameter('movie_id', $data['id'])
+            ->fetchAllAssociative();
+        return $this->fromDataToMovie($data, $sessionsData);
     }
 
-    private function fromDataToMovie(array $data): Movie
+    private function fromDataToMovie(array $data, array $sessionsData): Movie
     {
+        $sessionList = array_map(fn($data) => new Session($data['location'], new Date($data['init_date']), new Date($data['end_date'])), $sessionsData);
         return new Movie(
             new Id($data['id']),
             $data['title'],
@@ -51,7 +60,9 @@ class DoctrineMovieRepository implements MovieRepository
             $data['link'],
             $data['comments'],
             (int)$data['film_festival_id'],
-            $data['alias']
+            $data['alias'],
+            $data['section'],
+            $sessionList
         );
 
     }
@@ -78,7 +89,7 @@ class DoctrineMovieRepository implements MovieRepository
         if (empty($data)) {
             throw new DataNotFound("No more movies left");
         }
-        return $this->fromDataToMovie($data);
+        return $this->fromDataToMovie($data, []);
     }
 
     /**
@@ -99,6 +110,6 @@ class DoctrineMovieRepository implements MovieRepository
         }
 
 
-        return array_map(fn($data) => $this->fromDataToMovie($data), $dataList);
+        return array_map(fn($data) => $this->fromDataToMovie($data, []), $dataList);
     }
 }

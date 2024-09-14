@@ -19,7 +19,7 @@ class GetAllMoviesAction extends BaseAction
         $id = $request->get('filmFestivalId');
         $response = $this->useCase->execute($id);
 
-        return new Response(json_encode($response));
+        return new Response(json_encode($response->movieList));
 
     }
 
