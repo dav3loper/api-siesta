@@ -10,9 +10,9 @@ class GetAllMoviesUseCase
     {
     }
 
-    public function execute(int $filmFestivalId): MovieListResponse
+    public function execute(int $filmFestivalId, int $groupId): MovieListResponse
     {
-        $movieList = $this->movieRepository->getAllByFilmFestivalId($filmFestivalId);
+        $movieList = $this->movieRepository->getAllByFilmFestivalId($filmFestivalId, $groupId);
 
         return new MovieListResponse($movieList);
 

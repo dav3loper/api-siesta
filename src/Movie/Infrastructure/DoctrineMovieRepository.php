@@ -10,6 +10,9 @@ use Siesta\Shared\Date\Date;
 use Siesta\Shared\Exception\DataNotFound;
 use Siesta\Shared\Exception\InternalError;
 use Siesta\Shared\Id\Id;
+use Siesta\Shared\Score\Score;
+use Siesta\Vote\Domain\Vote;
+use Siesta\Vote\Domain\VoteCollection;
 use Throwable;
 
 class DoctrineMovieRepository implements MovieRepository
@@ -49,8 +52,7 @@ class DoctrineMovieRepository implements MovieRepository
 
     private function fromDataToMovie(array $data, array $sessionsData): Movie
     {
-        $sessionList = array_map(fn($data) =>
-        new Session($data['location'], new Date($data['init_date']), new Date($data['end_date']), $data['movies'])
+        $sessionList = array_map(fn($data) => new Session($data['location'], new Date($data['init_date']), new Date($data['end_date']), $data['movies'])
             , $sessionsData);
         return new Movie(
             new Id($data['id']),
@@ -98,7 +100,7 @@ class DoctrineMovieRepository implements MovieRepository
      * @return Movie[]
      * @throws InternalError
      */
-    public function getAllByFilmFestivalId(int $filmFestivalId): array
+    public function getAllByFilmFestivalId(int $filmFestivalId, int $groupId): array
     {
         try {
             $dataList = $this->connection->createQueryBuilder()
@@ -111,7 +113,42 @@ class DoctrineMovieRepository implements MovieRepository
             throw new InternalError($e->getMessage());
         }
 
+        $movieList = [];
+        foreach ($dataList as $movie) {
+            $movie = $this->fromDataToMovie($movie, []);
+            $voteCollection = $this->getVotesForMovie($movie->id, $groupId);
+            $movie->setVoteCollection($voteCollection);
+            $movieList[] = $movie;
+        }
 
-        return array_map(fn($data) => $this->fromDataToMovie($data, []), $dataList);
+        return $movieList;
+    }
+
+    private function getVotesForMovie(Id $id, int $groupId): VoteCollection
+    {
+        try {
+            $dataList = $this->connection->createQueryBuilder()
+                ->select('*')
+                ->from('vote')
+                ->where('movie_id=:id')
+                ->andWhere('group_id=:group_id')
+                ->setParameter('id', $id)
+                ->setParameter('group_id', $groupId)
+                ->fetchAllAssociative();
+        } catch (Throwable $e) {
+            throw new InternalError($e->getMessage());
+        }
+
+        return new VoteCollection(array_map(fn($data) => $this->fromDataToVote($data), $dataList));
+    }
+
+    private function fromDataToVote(array $data): Vote
+    {
+        return new Vote(
+            new Id($data['user_id']),
+            Score::from($data['score']),
+            new Id($data['movie_id']),
+            new Id($data['group_id']),
+        );
     }
 }

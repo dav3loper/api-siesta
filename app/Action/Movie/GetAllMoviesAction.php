@@ -17,7 +17,9 @@ class GetAllMoviesAction extends BaseAction
     public function __invoke(Request $request): Response
     {
         $id = $request->get('filmFestivalId');
-        $response = $this->useCase->execute($id);
+        $groupId = $request->headers->get('Group-Id');
+
+        $response = $this->useCase->execute($id, $groupId);
 
         return new Response(json_encode($response->movieList));
 
