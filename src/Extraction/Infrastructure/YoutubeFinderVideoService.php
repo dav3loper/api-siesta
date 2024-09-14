@@ -33,7 +33,7 @@ class YoutubeFinderVideoService implements FinderVideoService
 
     private function getFirstVideoByText(string $text): SearchResult
     {
-        $videos = $this->client->search->listSearch(self::PART_TO_FIND, [self::QUERY_PARAM => $text, self::TYPE => self::ALLOWED_TYPE]);
+        $videos = $this->client->search->listSearch(self::PART_TO_FIND, [self::QUERY_PARAM => $text, self::TYPE => self::ALLOWED_TYPE, 'maxResults' => 1]);
 
         if (!$videos->getItems()) {
             throw new \Exception('No video found');

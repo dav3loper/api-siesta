@@ -100,7 +100,6 @@ class ObtainMoviesFromJsonCommand extends Command
     private function getTrailer(string $title): string
     {
         try {
-            return 'notrailer';
             $result = $this->finderVideoService->findByText("$title official trailer");
             return $result;
         } catch (\Throwable $e) {
