@@ -4,7 +4,7 @@ namespace Siesta\Movie\Application;
 
 use Siesta\Movie\Domain\Movie;
 
-class MovieResponse
+class MovieResponse implements \JsonSerializable
 {
     public function __construct(
         public readonly Movie $movie
@@ -12,4 +12,9 @@ class MovieResponse
     {
     }
 
+
+    public function jsonSerialize(): mixed
+    {
+        return $this->movie->jsonSerialize();
+    }
 }

@@ -73,7 +73,7 @@ class ObtainMoviesFromJsonCommand extends Command
                 $movieData['image'],
                 $this->getTrailer($titleForTrailer),
                 $movieData['duration'],
-                $movieData['synopsis']['es'],
+                html_entity_decode($movieData['synopsis']['es']),
                 self::HOST . $movieData['url']['es'],
                 $editionId,
                 $section,

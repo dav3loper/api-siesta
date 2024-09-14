@@ -49,7 +49,9 @@ class DoctrineMovieRepository implements MovieRepository
 
     private function fromDataToMovie(array $data, array $sessionsData): Movie
     {
-        $sessionList = array_map(fn($data) => new Session($data['location'], new Date($data['init_date']), new Date($data['end_date'])), $sessionsData);
+        $sessionList = array_map(fn($data) =>
+        new Session($data['location'], new Date($data['init_date']), new Date($data['end_date']), $data['movies'])
+            , $sessionsData);
         return new Movie(
             new Id($data['id']),
             $data['title'],
