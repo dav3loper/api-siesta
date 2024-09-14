@@ -56,7 +56,7 @@ class DoctrineMovieRepository implements MovieRepository
                 'location' => $session['location'],
                 'init_date' => $session['init_date'],
                 'end_date' => $session['end_date'],
+                'movies' => implode(',', $session['films'])
             ]), $movie->sessions);
-        exit;
     }
 }

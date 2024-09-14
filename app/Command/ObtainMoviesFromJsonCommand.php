@@ -16,9 +16,9 @@ class ObtainMoviesFromJsonCommand extends Command
     private const HOST = 'https://sitgesfilmfestival.com/';
 
     public function __construct(
-        private readonly MovieRepository $movieRepository,
+        private readonly MovieRepository    $movieRepository,
         private readonly FinderVideoService $finderVideoService,
-        private readonly MovieTransformer $movieTransformer,
+        private readonly MovieTransformer   $movieTransformer,
     )
     {
         parent::__construct();
@@ -29,10 +29,11 @@ class ObtainMoviesFromJsonCommand extends Command
         $jsonSessionData = json_decode($sessionData, true)['sessions'];
         $sessionsById = [];
         foreach ($jsonSessionData as $session) {
-            $sessionsById[$session['name']['es']][] = [
+            $sessionsById[$session['id']] = [
                 'location' => $this->movieTransformer->fromDataLocationToLocation($session['locations'][0]),
                 'init_date' => $session['start_date'],
                 'end_date' => $session['end_date'],
+                'films' => $session['films'],
             ];
         }
         return $sessionsById;
@@ -50,34 +51,48 @@ class ObtainMoviesFromJsonCommand extends Command
     public function execute(InputInterface $input, OutputInterface $output): int
     {
         $editionId = $input->getArgument('edition_id');
-        exit;
         $data = file_get_contents($input->getArgument('file'));
         $sessionData = file_get_contents($input->getArgument('sessions'));
         $jsonData = json_decode($data, true);
         $sessionsById = $this->extractSessions($sessionData);
 
         $movieList = [];
-        foreach($jsonData['films'] as $movieData){
-            if($movieData['types'] && $movieData['types'][0] !== '611-film_types'){
+        $movieRelation = [];
+        foreach ($jsonData['films'] as $movieData) {
+            if ($movieData['types'] && $movieData['types'][0] !== '611-film_types') {
                 continue;
             }
             $titleForTrailer = !empty($movieData['original_title'])
                 ? $movieData['original_title']
                 : $movieData['international_title'];
 
+            $section = $this->movieTransformer->fromCategoryDataToCategory($movieData['sections'][0] ?? '');
+            if(in_array($section,['Brigadoon', 'Sitges Clàssics', 'Sitges Documenta', 'Sitges Family - Kids en Acció', 'Sitges Family - Kids', 'Seven Chances'])) continue;
             $movieList[] = new Movie(
                 $movieData['international_title'],
                 $movieData['image'],
                 $this->getTrailer($titleForTrailer),
                 $movieData['duration'],
                 $movieData['synopsis']['es'],
-                self::HOST.$movieData['url']['es'],
+                self::HOST . $movieData['url']['es'],
                 $editionId,
-                $this->movieTransformer->fromCategoryDataToCategory($movieData['sections'][0] ?? ''),
-                $sessionsById[$movieData['international_title']] ?? []
+                $section,
+                $this->getSessionForMovie($sessionsById, $movieData['id']),
             );
+            $movieRelation[$movieData['id']] = $movieData['international_title'];
         }
-        array_map(fn(Movie $movie) => $this->movieRepository->store($movie), $movieList);
+        //TODO: fix this
+        array_map(function (Movie $movie) use ($movieRelation){
+            $newSessions = [];
+            foreach($movie->sessions as $session){
+                $session['films'] = array_map(fn($movie) => $movieRelation[$movie] ?? 'otra', $session['films']);
+                $newSessions[] = $session;
+            }
+            if($newSessions){
+                $movie->sessions = $newSessions;
+            }
+            $this->movieRepository->store($movie);
+        }, $movieList);
 
         return self::SUCCESS;
     }
@@ -85,12 +100,24 @@ class ObtainMoviesFromJsonCommand extends Command
     private function getTrailer(string $title): string
     {
         try {
+            return 'notrailer';
             $result = $this->finderVideoService->findByText("$title official trailer");
             return $result;
-        }catch (\Throwable $e){
+        } catch (\Throwable $e) {
             echo $e->getMessage();
             return 'notrailer';
         }
 
+    }
+
+    private function getSessionForMovie(array $sessionsById, mixed $id): array
+    {
+        $sessionList = [];
+        foreach ($sessionsById as $session) {
+            if (in_array($id, $session['films'])) {
+                $sessionList[] = $session;
+            }
+        }
+        return $sessionList;
     }
 }

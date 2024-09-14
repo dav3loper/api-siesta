@@ -17,7 +17,7 @@ class Movie
         public readonly ?string $link,
         public readonly int    $film_festival_id,
         public readonly string $section,
-        public readonly array $sessions
+        public array $sessions
     )
     {
     }

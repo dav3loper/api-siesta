@@ -23,6 +23,7 @@ final class Version20240913204050_create_table_sessions extends AbstractMigratio
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('movie_id', 'integer', ['notnull' => true]);
         $table->addColumn('location', 'string', ['notnull' => true, 'length' => 512]);
+        $table->addColumn('movies', 'string', ['notnull' => true, 'length' => 1024]);
         $table->addColumn('init_date', 'datetime', ['notnull' => true]);
         $table->addColumn('end_date', 'datetime', ['notnull' => true]);
         $table->setPrimaryKey(['id']);
