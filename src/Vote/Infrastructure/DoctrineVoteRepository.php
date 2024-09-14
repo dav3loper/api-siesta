@@ -96,8 +96,10 @@ class DoctrineVoteRepository implements VoteRepository
                 ->innerJoin('v', 'movie', 'm', 'm.id = v.movie_id')
                 ->where('m.film_festival_id=:id')
                 ->andWhere('v.user_id=:userId')
+                ->andWhere('v.score !=:score')
                 ->setParameter('id', $filmFestivalId)
                 ->setParameter('userId', $userId)
+                ->setParameter('score', "-1")
                 ->orderBy('m.id', 'DESC')
                 ->fetchAssociative();
         } catch (Throwable $e) {
