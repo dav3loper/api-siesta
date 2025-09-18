@@ -1,0 +1,62 @@
+## Get movie
+GET http://localhost:8080/movie/1
+Accept: application/json
+
+### get movie with header
+GET http://localhost:8080/movie/4226
+Accept: application/json
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMjEiLCJ1c2VyX25hbWUiOiJEYXZlIiwiZ3JvdXBfaWQiOiIxIiwiZ3JvdXBfbmFtZSI6IlRvbCBHcml0byJ9.Q2RMEFhaqAsSHjJhrcbc22eBSOGbms7D_V-LK34AvZ4
+
+### get all movies
+GET http://localhost:8080/film-festival/7/movies
+Accept: application/json
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMjEiLCJ1c2VyX25hbWUiOiJEYXZlIiwiZ3JvdXBfaWQiOiIxIiwiZ3JvdXBfbmFtZSI6IlRvbCBHcml0byJ9.Q2RMEFhaqAsSHjJhrcbc22eBSOGbms7D_V-LK34AvZ4
+
+### Get votes for movie
+GET http://localhost:8080/movie/4226/votes
+Accept: application/json
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMjEiLCJ1c2VyX25hbWUiOiJEYXZlIiwiZ3JvdXBfaWQiOiIxIiwiZ3JvdXBfbmFtZSI6IlRvbCBHcml0byJ9.Q2RMEFhaqAsSHjJhrcbc22eBSOGbms7D_V-LK34AvZ4
+
+###
+POST http://localhost:8080/movie/3722/vote
+Content-Type: application/json
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMjEiLCJ1c2VyX25hbWUiOiJEYXZlIiwiZ3JvdXBfaWQiOiIxIiwiZ3JvdXBfbmFtZSI6IlRvbCBHcml0byJ9.Q2RMEFhaqAsSHjJhrcbc22eBSOGbms7D_V-LK34AvZ4
+
+[{"user_id":"1","score":"-1","user_name":"Sandra"},{"user_id":"11","score":"0","user_name":"Unai"},{"user_id":"21","score":"1","user_name":"Dave"},{"user_id":"31","score":"2","user_name":"Putojebi"},{"user_id":"41","score":"-1","user_name":"Leticia"}]
+<> 2024-08-25T100955.201.json
+
+### Login
+
+POST http://localhost:8080/login
+Content-Type: application/json
+
+{
+  "email": "davekrelak@hotmail.com",
+  "password" : "123456"
+}
+
+### LOGIN PRO
+
+POST https://darkslateblue-walrus-393957.hostingersite.com/login
+Content-Type: application/json
+
+{
+  "email": "davekrelak@hotmail.com",
+  "password" : "123456"
+}
+
+
+### OPTIONS PRO
+
+OPTIONS https://darkslateblue-walrus-393957.hostingersite.com/login
+
+
+### Last movie voted
+GET http://localhost:8080/film-festival/99/next
+Accept: application/json
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMjEiLCJ1c2VyX25hbWUiOiJEYXZlIiwiZ3JvdXBfaWQiOiIxIiwiZ3JvdXBfbmFtZSI6IlRvbCBHcml0byJ9.Q2RMEFhaqAsSHjJhrcbc22eBSOGbms7D_V-LK34AvZ4
+
+### Users from group
+GET http://localhost:8080/group/1
+Accept: application/json
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMjEiLCJ1c2VyX25hbWUiOiJEYXZlIiwiZ3JvdXBfaWQiOiIxIiwiZ3JvdXBfbmFtZSI6IlRvbCBHcml0byJ9.Q2RMEFhaqAsSHjJhrcbc22eBSOGbms7D_V-LK34AvZ4
