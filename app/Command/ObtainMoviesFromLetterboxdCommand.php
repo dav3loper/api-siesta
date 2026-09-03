@@ -6,6 +6,7 @@ use Siesta\Extraction\Domain\FinderVideoService;
 use Siesta\Extraction\Domain\Movie;
 use Siesta\Extraction\Domain\MovieListFinder;
 use Siesta\Extraction\Domain\MovieRepository;
+use Siesta\Extraction\Domain\PosterFinder;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -20,6 +21,7 @@ class ObtainMoviesFromLetterboxdCommand extends Command
         private readonly MovieListFinder $movieListFinder,
         private readonly MovieRepository  $movieRepository,
         private readonly FinderVideoService $finderVideoService,
+        private readonly PosterFinder $posterFinder,
     )
     {
         parent::__construct();
@@ -28,7 +30,7 @@ class ObtainMoviesFromLetterboxdCommand extends Command
     protected function configure(): void
     {
         $this->setName('obtain-movies-from-letterboxd');
-        $this->setDescription('Seed movies from a Letterboxd list (title + trailer only; duration/summary/sessions are left empty and get filled in by re-running obtain-movies with the official JSON once it is available)')
+        $this->setDescription('Seed movies from a Letterboxd list (title + trailer + TMDB poster; duration/summary/sessions are left empty and get filled in by re-running obtain-movies with the official JSON once it is available)')
             ->addArgument('url', InputArgument::REQUIRED, 'Letterboxd list URL, e.g. https://letterboxd.com/user/list/sitges-2026/')
             ->addArgument('edition_id', InputArgument::REQUIRED, 'Edition to import')
             ->addOption('stop-on-first-trailer-failure', null, InputOption::VALUE_NONE, 'Abort without importing anything if the trailer search fails for the first movie (useful to catch a broken YouTube API key/quota early)');
@@ -48,7 +50,7 @@ class ObtainMoviesFromLetterboxdCommand extends Command
             }
             $this->movieRepository->store(new Movie(
                 $entry->title,
-                '',
+                $this->posterFinder->findByTitle($entry->title, $entry->year),
                 $trailer,
                 0,
                 '',
