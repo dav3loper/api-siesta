@@ -12,6 +12,11 @@ vote-for-movie:
     controller: Siesta\App\Action\Vote\VoteForMovieAction
     methods: POST
 
+get-film-festivals:
+    path: /film-festival
+    controller: Siesta\App\Action\FilmFestival\GetAllFilmFestivalsAction
+    methods: GET
+
 last-movie-voted-for-user:
     path: /film-festival/{filmFestivalId}/next
     controller: Siesta\App\Action\Vote\GetNextMovieToVoteAction
