@@ -34,6 +34,9 @@ class DoctrineMovieRepository implements MovieRepository
                 'section' => $movie->section,
                 'updated_at' => new Date('now')
             ], ['id' => $wasAlreadyStored]);
+            if ($movie->sessions) {
+                $this->replaceSessions((int)$wasAlreadyStored, $movie->sessions);
+            }
             return;
         }
 
@@ -49,7 +52,13 @@ class DoctrineMovieRepository implements MovieRepository
             'created_at' => new Date('now'),
             'updated_at' => new Date('now')
         ]);
-        $movieId = $this->connection->lastInsertId();
+        $movieId = (int)$this->connection->lastInsertId();
+        $this->replaceSessions($movieId, $movie->sessions);
+    }
+
+    private function replaceSessions(int $movieId, array $sessions): void
+    {
+        $this->connection->delete(self::SESSIONS_TABLE, ['movie_id' => $movieId]);
         array_map(fn(array $session) =>
             $this->connection->insert(self::SESSIONS_TABLE, [
                 'movie_id' => $movieId,
@@ -57,6 +66,6 @@ class DoctrineMovieRepository implements MovieRepository
                 'init_date' => $session['init_date'],
                 'end_date' => $session['end_date'],
                 'movies' => implode(',', $session['films'])
-            ]), $movie->sessions);
+            ]), $sessions);
     }
 }

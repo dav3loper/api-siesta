@@ -46,3 +46,7 @@ services:
         arguments:
             $clientOrConfig: '@Google\Client'
 
+    Siesta\Extraction\Infrastructure\TmdbPosterFinder:
+        arguments:
+            $readAccessToken: '%env(TMDB_READ_ACCESS_TOKEN)%'
+
