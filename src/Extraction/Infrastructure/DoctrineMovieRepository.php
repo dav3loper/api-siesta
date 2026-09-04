@@ -11,6 +11,7 @@ class DoctrineMovieRepository implements MovieRepository
 {
     const TABLE = 'movie';
     const SESSIONS_TABLE = 'sessions';
+    const NO_TRAILER = 'notrailer';
 
     public function __construct(private Connection $connection)
     {
@@ -18,24 +19,24 @@ class DoctrineMovieRepository implements MovieRepository
 
     public function store(Movie $movie): void
     {
-        $wasAlreadyStored = $this->connection->createQueryBuilder()
-            ->select('id')
+        $existing = $this->connection->createQueryBuilder()
+            ->select('id', 'poster', 'trailer_id', 'summary')
             ->from(self::TABLE)
             ->where('title = :title')
             ->setParameter('title', $movie->title)
-            ->fetchOne();
-        if($wasAlreadyStored){
+            ->fetchAssociative();
+        if ($existing) {
             $this->connection->update(self::TABLE, [
-                'poster' => $movie->poster,
-                'trailer_id' => $movie->trailer_id,
+                'poster' => $movie->poster !== '' ? $movie->poster : $existing['poster'],
+                'trailer_id' => $movie->trailer_id !== self::NO_TRAILER ? $movie->trailer_id : $existing['trailer_id'],
                 'duration' => $movie->duration,
-                'summary' => $movie->summary,
+                'summary' => $movie->summary !== '' ? $movie->summary : $existing['summary'],
                 'link' => $movie->link,
                 'section' => $movie->section,
                 'updated_at' => new Date('now')
-            ], ['id' => $wasAlreadyStored]);
+            ], ['id' => $existing['id']]);
             if ($movie->sessions) {
-                $this->replaceSessions((int)$wasAlreadyStored, $movie->sessions);
+                $this->replaceSessions((int)$existing['id'], $movie->sessions);
             }
             return;
         }
