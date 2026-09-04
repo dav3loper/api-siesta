@@ -12,6 +12,11 @@ vote-for-movie:
     controller: Siesta\App\Action\Vote\VoteForMovieAction
     methods: POST
 
+rate-movie:
+    path: /movie/{movieId}/rating
+    controller: Siesta\App\Action\Rating\RateMovieAction
+    methods: POST
+
 get-film-festivals:
     path: /film-festival
     controller: Siesta\App\Action\FilmFestival\GetAllFilmFestivalsAction
