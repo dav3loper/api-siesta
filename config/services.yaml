@@ -50,3 +50,11 @@ services:
         arguments:
             $readAccessToken: '%env(TMDB_READ_ACCESS_TOKEN)%'
 
+    Siesta\Extraction\Infrastructure\TmdbSynopsisFinder:
+        arguments:
+            $readAccessToken: '%env(TMDB_READ_ACCESS_TOKEN)%'
+
+    Siesta\Extraction\Infrastructure\DeepLTranslatorService:
+        arguments:
+            $apiKey: '%env(DEEPL_API_KEY)%'
+
