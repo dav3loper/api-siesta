@@ -112,6 +112,27 @@ class DoctrineVoteRepository implements VoteRepository
     }
 
     /**
+     * @throws InternalError
+     */
+    public function countMoviesLeftToVote(Id $userId, Id $filmFestivalId): int
+    {
+        try {
+            return (int)$this->connection->createQueryBuilder()
+                ->select('COUNT(m.id)')
+                ->from('movie', 'm')
+                ->leftJoin('m', 'vote', 'v', 'v.movie_id = m.id AND v.user_id = :userId AND v.score != :score')
+                ->where('m.film_festival_id = :filmFestivalId')
+                ->andWhere('v.id IS NULL')
+                ->setParameter('userId', $userId)
+                ->setParameter('score', Score::NOT_YET->value)
+                ->setParameter('filmFestivalId', $filmFestivalId)
+                ->fetchOne();
+        } catch (Throwable $e) {
+            throw new InternalError($e->getMessage());
+        }
+    }
+
+    /**
      * @param mixed $dataOfVote
      * @return Vote
      */

@@ -21,4 +21,9 @@ interface VoteRepository
      * @throws InternalError
      */
     public function getLastVotedMovieForUserAndFilmFestival(Id $userId, Id $filmFestivalId): Vote;
+
+    /**
+     * @throws InternalError
+     */
+    public function countMoviesLeftToVote(Id $userId, Id $filmFestivalId): int;
 }

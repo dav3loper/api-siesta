@@ -22,6 +22,11 @@ last-movie-voted-for-user:
     controller: Siesta\App\Action\Vote\GetNextMovieToVoteAction
     methods: GET
 
+pending-votes-count-for-user:
+    path: /film-festival/{filmFestivalId}/pending-votes
+    controller: Siesta\App\Action\Vote\GetPendingVotesCountAction
+    methods: GET
+
 all-movies-of-film-festival:
     path: /film-festival/{filmFestivalId}/movies
     controller: Siesta\App\Action\Movie\GetAllMoviesAction
