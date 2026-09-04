@@ -17,6 +17,11 @@ rate-movie:
     controller: Siesta\App\Action\Rating\RateMovieAction
     methods: POST
 
+agent-chat:
+    path: /agent/chat
+    controller: Siesta\App\Action\Agent\ChatWithAgentAction
+    methods: POST
+
 get-film-festivals:
     path: /film-festival
     controller: Siesta\App\Action\FilmFestival\GetAllFilmFestivalsAction

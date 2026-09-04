@@ -58,3 +58,12 @@ services:
         arguments:
             $apiKey: '%env(DEEPL_API_KEY)%'
 
+    Siesta\Agent\Infrastructure\AnthropicAgentClient:
+        arguments:
+            $apiKey: '%env(ANTHROPIC_API_KEY)%'
+            $model: '%env(ANTHROPIC_MODEL)%'
+
+    Siesta\Agent\Application\Chat\ChatWithAgentUseCase:
+        arguments:
+            $communicationsEnabled: '%env(bool:AGENT_COMMUNICATIONS_ENABLED)%'
+
