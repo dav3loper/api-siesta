@@ -12,6 +12,7 @@ class MovieBackground
      * @param string[] $genres
      * @param string[] $mainCast
      * @param string[] $otherMoviesByDirector
+     * @param string[] $awards
      */
     public function __construct(
         public readonly string $title,
@@ -20,7 +21,9 @@ class MovieBackground
         public readonly array $genres,
         public readonly array $mainCast,
         public readonly array $otherMoviesByDirector,
+        public readonly array $awards,
         public readonly ?float $audienceScore,
+        public readonly int $audienceVotes,
     )
     {
     }
