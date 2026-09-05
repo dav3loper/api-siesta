@@ -55,7 +55,7 @@ class DoctrineAgentInteractionRepository implements AgentInteractionRepository
     {
         try {
             $rows = $this->connection->createQueryBuilder()
-                ->select('user_message', 'agent_response')
+                ->select('user_message', 'agent_response', 'movie_title', 'movie_year')
                 ->from('agent_interaction')
                 ->where('user_id=:userId')
                 ->andWhere('conversation_id=:conversationId')
@@ -75,7 +75,9 @@ class DoctrineAgentInteractionRepository implements AgentInteractionRepository
         $turns = array_map(
             fn (array $row): ConversationTurn => new ConversationTurn(
                 new UserMessage($row['user_message']),
-                $row['agent_response']
+                $row['agent_response'],
+                $row['movie_title'],
+                $row['movie_year'] !== null ? (int)$row['movie_year'] : null
             ),
             array_reverse($rows)
         );

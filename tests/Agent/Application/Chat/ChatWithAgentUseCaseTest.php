@@ -247,7 +247,7 @@ class ChatWithAgentUseCaseTest extends TestCase
         $this->userProfileRepository->method('getByUserId')
             ->willReturn(new UserProfile(new RatedMovieCollection([])));
         $this->agentInteractionRepository->history = new ConversationTurnCollection([
-            new ConversationTurn(new UserMessage('¿qué me recomiendas?'), 'Mira «Titane»'),
+            new ConversationTurn(new UserMessage('¿qué me recomiendas?'), 'Mira «Titane»', null, null),
         ]);
 
         $this->agentClient->expects(self::once())

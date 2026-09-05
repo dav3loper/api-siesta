@@ -103,7 +103,7 @@ class AnthropicAgentClient implements AgentClient
         $messages = [];
         foreach ($history as $turn) {
             /** @var ConversationTurn $turn */
-            $messages[] = ['role' => 'user', 'content' => $turn->userMessage->value()];
+            $messages[] = ['role' => 'user', 'content' => $turn->messageWithContext()];
             $messages[] = ['role' => 'assistant', 'content' => $turn->agentResponse];
         }
 
