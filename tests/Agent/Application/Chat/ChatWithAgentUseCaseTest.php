@@ -7,7 +7,11 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Siesta\Agent\Application\Chat\ChatWithAgentRequest;
 use Siesta\Agent\Application\Chat\ChatWithAgentUseCase;
+use Siesta\Agent\Application\Tool\MovieBackgroundTool;
+use Siesta\Agent\Application\Tool\SearchCatalogTool;
 use Siesta\Agent\Domain\AgentClient;
+use Siesta\Agent\Domain\Background\MovieBackgroundFinder;
+use Siesta\Agent\Domain\Background\MovieBackgroundRepository;
 use Siesta\Agent\Domain\ConversationTurn;
 use Siesta\Agent\Domain\ConversationTurnCollection;
 use Siesta\Agent\Domain\Interaction\InteractionStatus;
@@ -19,6 +23,7 @@ use Siesta\Agent\Domain\RecommendationValidator;
 use Siesta\Agent\Domain\Stream\TextChunk;
 use Siesta\Agent\Domain\Stream\ToolInvoked;
 use Siesta\Agent\Domain\Stream\UnknownTitlesDetected;
+use Siesta\Agent\Domain\Tool\AgentToolCollection;
 use Siesta\Agent\Domain\UserMessage;
 use Siesta\Agent\Domain\UserProfile;
 use Siesta\Agent\Domain\UserProfileRepository;
@@ -218,10 +223,49 @@ class ChatWithAgentUseCaseTest extends TestCase
             new TextChunk('Sí, está.'),
         ]);
 
-        $chunks = $this->textOf($this->useCase->execute($this->request('¿está Titane?', null, null)));
+        $events = iterator_to_array($this->useCase->execute($this->request('¿está Titane?', null, null)));
 
-        self::assertEquals(['Déjame mirar. ', 'Sí, está.'], $chunks);
+        self::assertEquals(['Déjame mirar. ', 'Sí, está.'], $this->textOf($events));
         self::assertCount(1, $this->agentInteractionRepository->last()->toolCalls());
+    }
+
+    #[Test]
+    public function whenTheAgentUsesToolsThenTheyAreForwardedSoTheCallerCanObserveThem(): void
+    {
+        $this->userProfileRepository->method('getByUserId')
+            ->willReturn(new UserProfile(new RatedMovieCollection([])));
+        $this->agentClient->method('streamAnswer')->willReturn([
+            new ToolInvoked('movie_background', ['title' => 'Titane'], 'Dirigida por: Julia Ducournau'),
+            new TextChunk('La dirige Julia Ducournau.'),
+        ]);
+
+        $events = iterator_to_array($this->useCase->execute($this->request('¿quién la dirige?', 'Titane', 2021)));
+
+        $toolEvents = array_values(array_filter($events, fn ($event): bool => $event instanceof ToolInvoked));
+        self::assertCount(1, $toolEvents);
+        self::assertEquals('movie_background', $toolEvents[0]->toolName);
+    }
+
+    #[Test]
+    public function shouldOfferTheCatalogAndTheBackgroundToolsToTheAgent(): void
+    {
+        $this->userProfileRepository->method('getByUserId')
+            ->willReturn(new UserProfile(new RatedMovieCollection([])));
+
+        $this->agentClient->expects(self::once())
+            ->method('streamAnswer')
+            ->with(
+                self::anything(),
+                self::anything(),
+                self::anything(),
+                self::callback(function (AgentToolCollection $tools): bool {
+                    return $tools->findByName('search_catalog') !== null
+                        && $tools->findByName('movie_background') !== null;
+                })
+            )
+            ->willReturn([]);
+
+        $this->textOf($this->useCase->execute($this->request('¿quién dirige esto?', 'Titane', 2021)));
     }
 
     #[Test]
@@ -289,7 +333,11 @@ class ChatWithAgentUseCaseTest extends TestCase
         return new ChatWithAgentUseCase(
             $this->userProfileRepository,
             $this->agentInteractionRepository,
-            $this->createMock(MovieCatalog::class),
+            new SearchCatalogTool($this->createMock(MovieCatalog::class)),
+            new MovieBackgroundTool(
+                $this->createMock(MovieBackgroundRepository::class),
+                $this->createMock(MovieBackgroundFinder::class)
+            ),
             $this->recommendationValidator,
             $this->agentClient,
             $communicationsEnabled,

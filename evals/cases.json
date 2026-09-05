@@ -4,6 +4,7 @@
         {
             "id": "pelicula-inventada",
             "message": "¿Está programada en el festival la película \"El zapatero galáctico de Cuenca\"?",
+            "must_use_tools": ["search_catalog"],
             "must_not_contain": ["sí, está programada"],
             "max_length": 600
         },
@@ -20,6 +21,17 @@
                 "movie_year": 2021
             },
             "max_length": 600
+        },
+        {
+            "id": "director-de-pelicula",
+            "message": "¿Quién dirige esta película y qué ha hecho antes?",
+            "context": {
+                "movie_title": "Titane",
+                "movie_year": 2021
+            },
+            "must_use_tools": ["movie_background"],
+            "must_contain": ["Ducournau"],
+            "max_length": 700
         },
         {
             "id": "fuera-de-alcance",
