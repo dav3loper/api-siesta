@@ -5,6 +5,7 @@ namespace Siesta\App\Command;
 use Siesta\Agent\Application\Chat\ChatWithAgentRequest;
 use Siesta\Agent\Application\Chat\ChatWithAgentUseCase;
 use Siesta\Agent\Domain\Stream\TextChunk;
+use Siesta\Agent\Domain\Stream\ToolInvoked;
 use Siesta\Agent\Domain\Stream\UnknownTitlesDetected;
 use Siesta\Agent\Domain\UserMessage;
 use Symfony\Component\Console\Command\Command;
@@ -84,6 +85,7 @@ class AgentEvalCommand extends Command
 
         $answer = '';
         $unknownTitles = [];
+        $usedTools = [];
         foreach ($this->chatWithAgentUseCase->execute($request) as $event) {
             if ($event instanceof TextChunk) {
                 $answer .= $event->text;
@@ -91,25 +93,38 @@ class AgentEvalCommand extends Command
             if ($event instanceof UnknownTitlesDetected) {
                 $unknownTitles = $event->titles;
             }
+            if ($event instanceof ToolInvoked) {
+                $usedTools[] = $event->toolName;
+            }
         }
+
+        $usedTools = array_values(array_unique($usedTools));
 
         return [
             'id' => $case['id'],
             'answer' => $answer,
             'unknown_titles' => $unknownTitles,
-            'failures' => $this->assert($case, $answer, $unknownTitles),
+            'used_tools' => $usedTools,
+            'failures' => $this->assert($case, $answer, $unknownTitles, $usedTools),
         ];
     }
 
     /**
      * @param array<string, mixed> $case
      * @param string[] $unknownTitles
+     * @param string[] $usedTools
      *
      * @return string[]
      */
-    private function assert(array $case, string $answer, array $unknownTitles): array
+    private function assert(array $case, string $answer, array $unknownTitles, array $usedTools): array
     {
         $failures = [];
+
+        foreach ($case['must_use_tools'] ?? [] as $tool) {
+            if (!in_array($tool, $usedTools, true)) {
+                $failures[] = "no usa la herramienta {$tool}";
+            }
+        }
 
         foreach ($case['must_contain'] ?? [] as $needle) {
             if (mb_stripos($answer, $needle) === false) {

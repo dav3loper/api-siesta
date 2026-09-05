@@ -58,6 +58,10 @@ services:
         arguments:
             $apiKey: '%env(DEEPL_API_KEY)%'
 
+    Siesta\Agent\Infrastructure\TmdbMovieBackgroundFinder:
+        arguments:
+            $readAccessToken: '%env(TMDB_READ_ACCESS_TOKEN)%'
+
     Siesta\Agent\Infrastructure\AnthropicAgentClient:
         arguments:
             $apiKey: '%env(ANTHROPIC_API_KEY)%'
