@@ -7,6 +7,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Throwable;
 
 class JwtChecker
 {
@@ -24,16 +25,22 @@ class JwtChecker
         if (!$needsAuthorization || !$event->isMainRequest()) {
             return;
         }
-        //TODO: cambiar por try/catch
         $authToken = $this->getHeaderAuthorization($request);
-        if ($authToken) {
-            $params = $this->decodeToken($authToken);
-            $request->headers->add($params);
-        } else {
+        if (!$authToken) {
             $event->setResponse(new JsonResponse([], 401));
+            return;
         }
 
+        try {
+            $params = $this->decodeToken($authToken);
+        } catch (Throwable) {
+            // A token that cannot be read is a failed authentication, not a broken server:
+            // until now it escaped as the 500 of an uncaught JWT exception.
+            $event->setResponse(new JsonResponse([], 401));
+            return;
+        }
 
+        $request->headers->add($params);
     }
 
     private function getHeaderAuthorization(Request $request): string
