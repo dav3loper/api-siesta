@@ -12,6 +12,9 @@
 .idea
 Makefile
 docker/db/
+/example-antropic
+/env.bk_local
+/var/evals/
 
 ###> phpunit/phpunit ###
 /phpunit.xml

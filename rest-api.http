@@ -60,3 +60,26 @@ Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMjEiL
 GET http://localhost:8080/group/1
 Accept: application/json
 Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMjEiLCJ1c2VyX25hbWUiOiJEYXZlIiwiZ3JvdXBfaWQiOiIxIiwiZ3JvdXBfbmFtZSI6IlRvbCBHcml0byJ9.Q2RMEFhaqAsSHjJhrcbc22eBSOGbms7D_V-LK34AvZ4
+### Chat with the agent
+POST http://localhost:8080/agent/chat
+Content-Type: application/json
+Accept: text/event-stream
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMjEiLCJ1c2VyX25hbWUiOiJEYXZlIiwiZ3JvdXBfaWQiOiIxIiwiZ3JvdXBfbmFtZSI6IlRvbCBHcml0byJ9.Q2RMEFhaqAsSHjJhrcbc22eBSOGbms7D_V-LK34AvZ4
+
+{
+  "conversation_id": "3f6c1a2b9d4e4f0a8b7c6d5e4f3a2b1c",
+  "message": "¿Qué me recomiendas ver este año?",
+  "context": {
+    "movie_title": "Titane",
+    "movie_year": 2021
+  }
+}
+
+### Chat with the agent - empty message, answers 400 instead of opening the stream
+POST http://localhost:8080/agent/chat
+Content-Type: application/json
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMjEiLCJ1c2VyX25hbWUiOiJEYXZlIiwiZ3JvdXBfaWQiOiIxIiwiZ3JvdXBfbmFtZSI6IlRvbCBHcml0byJ9.Q2RMEFhaqAsSHjJhrcbc22eBSOGbms7D_V-LK34AvZ4
+
+{
+  "message": ""
+}
