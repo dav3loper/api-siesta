@@ -3,9 +3,13 @@
 namespace Siesta\Agent\Infrastructure;
 
 use Doctrine\DBAL\Connection;
+use Siesta\Agent\Domain\ConversationTurn;
+use Siesta\Agent\Domain\ConversationTurnCollection;
 use Siesta\Agent\Domain\Interaction\AgentInteraction;
 use Siesta\Agent\Domain\Interaction\AgentInteractionRepository;
+use Siesta\Agent\Domain\Interaction\InteractionStatus;
 use Siesta\Agent\Domain\Stream\ToolInvoked;
+use Siesta\Agent\Domain\UserMessage;
 use Siesta\Shared\Date\Date;
 use Siesta\Shared\Exception\InternalError;
 use Siesta\Shared\Id\Id;
@@ -42,6 +46,41 @@ class DoctrineAgentInteractionRepository implements AgentInteractionRepository
         } catch (Throwable $e) {
             throw new InternalError($e->getMessage());
         }
+    }
+
+    /**
+     * @throws InternalError
+     */
+    public function lastTurnsOfConversation(Id $userId, string $conversationId, int $maxTurns): ConversationTurnCollection
+    {
+        try {
+            $rows = $this->connection->createQueryBuilder()
+                ->select('user_message', 'agent_response')
+                ->from('agent_interaction')
+                ->where('user_id=:userId')
+                ->andWhere('conversation_id=:conversationId')
+                ->andWhere('status=:status')
+                ->andWhere('agent_response IS NOT NULL')
+                ->andWhere("agent_response<>''")
+                ->orderBy('id', 'DESC')
+                ->setMaxResults($maxTurns)
+                ->setParameter('userId', $userId)
+                ->setParameter('conversationId', $conversationId)
+                ->setParameter('status', InteractionStatus::COMPLETED->value)
+                ->fetchAllAssociative();
+        } catch (Throwable $e) {
+            throw new InternalError($e->getMessage());
+        }
+
+        $turns = array_map(
+            fn (array $row): ConversationTurn => new ConversationTurn(
+                new UserMessage($row['user_message']),
+                $row['agent_response']
+            ),
+            array_reverse($rows)
+        );
+
+        return new ConversationTurnCollection($turns);
     }
 
     /**

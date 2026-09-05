@@ -5,6 +5,7 @@ namespace Siesta\Agent\Application\Chat;
 use Generator;
 use Siesta\Agent\Application\Tool\SearchCatalogTool;
 use Siesta\Agent\Domain\AgentClient;
+use Siesta\Agent\Domain\ConversationTurnCollection;
 use Siesta\Agent\Domain\Interaction\AgentInteraction;
 use Siesta\Agent\Domain\Interaction\AgentInteractionRepository;
 use Siesta\Agent\Domain\Interaction\InteractionStatus;
@@ -28,6 +29,7 @@ class ChatWithAgentUseCase
     private const COMMUNICATIONS_DISABLED_MESSAGE = 'Las comunicaciones están apagadas por ahora...';
     private const MAX_INTERACTIONS_PER_WINDOW = 30;
     private const RATE_LIMIT_WINDOW = '-1 hour';
+    private const MAX_HISTORY_TURNS = 10;
 
     public function __construct(
         private readonly UserProfileRepository $userProfileRepository,
@@ -70,10 +72,15 @@ class ChatWithAgentUseCase
 
         $profile = $this->userProfileRepository->getByUserId($userId);
         $systemPrompt = $this->buildSystemPrompt($profile, $request->movieTitle, $request->movieYear);
+        $history = $this->agentInteractionRepository->lastTurnsOfConversation(
+            $userId,
+            $request->conversationId,
+            self::MAX_HISTORY_TURNS
+        );
 
         $this->agentInteractionRepository->save($interaction);
 
-        return $this->stream($interaction, $systemPrompt);
+        return $this->stream($interaction, $systemPrompt, $history);
     }
 
     /**
@@ -99,14 +106,18 @@ class ChatWithAgentUseCase
     /**
      * @return Generator<AgentEvent>
      */
-    private function stream(AgentInteraction $interaction, string $systemPrompt): Generator
-    {
+    private function stream(
+        AgentInteraction $interaction,
+        string $systemPrompt,
+        ConversationTurnCollection $history
+    ): Generator {
         $answer = '';
         $toolCalls = [];
 
         try {
             $events = $this->agentClient->streamAnswer(
                 $systemPrompt,
+                $history,
                 $interaction->message,
                 new AgentToolCollection([new SearchCatalogTool($this->movieCatalog)])
             );

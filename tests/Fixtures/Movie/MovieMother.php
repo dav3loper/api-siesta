@@ -3,6 +3,8 @@
 namespace Siesta\Tests\Fixtures\Movie;
 
 use Siesta\Movie\Domain\Movie;
+use Siesta\Movie\Domain\Session;
+use Siesta\Shared\Date\Date;
 use Siesta\Shared\Id\Id;
 use Siesta\Tests\Fixtures\Mother;
 
@@ -18,6 +20,9 @@ class MovieMother extends Mother
     private string $comments;
     private int $film_festival_id;
     private ?string $alias;
+    private ?string $section;
+    /** @var Session[] */
+    private array $sessions;
 
     public static function create(): MovieMother
     {
@@ -36,6 +41,10 @@ class MovieMother extends Mother
         $this->comments = $this->faker->text();
         $this->film_festival_id = $this->faker->numberBetween(1, 50);
         $this->alias = $this->faker->name();
+        $this->section = $this->faker->word;
+        $this->sessions = [
+            new Session($this->faker->city, new Date('now'), new Date('+2 hours'), $this->faker->word),
+        ];
 
         return $this;
 
@@ -54,6 +63,8 @@ class MovieMother extends Mother
             $this->comments,
             $this->film_festival_id,
             $this->alias,
+            $this->section,
+            $this->sessions,
         );
     }
 }

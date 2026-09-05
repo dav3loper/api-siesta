@@ -2,6 +2,7 @@
 
 namespace Siesta\Tests\Fixtures\Agent;
 
+use Siesta\Agent\Domain\ConversationTurnCollection;
 use Siesta\Agent\Domain\Interaction\AgentInteraction;
 use Siesta\Agent\Domain\Interaction\AgentInteractionRepository;
 use Siesta\Agent\Domain\Interaction\InteractionStatus;
@@ -15,6 +16,25 @@ class InMemoryAgentInteractionRepository implements AgentInteractionRepository
     /** @var InteractionStatus[] the status each save was made with, since the entity keeps mutating */
     public array $savedStatuses = [];
     public int $interactionsInWindow = 0;
+    public ConversationTurnCollection $history;
+    /** @var array<string, mixed>|null the arguments the history was asked for */
+    public ?array $historyQuery = null;
+
+    public function __construct()
+    {
+        $this->history = new ConversationTurnCollection([]);
+    }
+
+    public function lastTurnsOfConversation(Id $userId, string $conversationId, int $maxTurns): ConversationTurnCollection
+    {
+        $this->historyQuery = [
+            'userId' => $userId->id,
+            'conversationId' => $conversationId,
+            'maxTurns' => $maxTurns,
+        ];
+
+        return $this->history;
+    }
 
     public function save(AgentInteraction $interaction): void
     {

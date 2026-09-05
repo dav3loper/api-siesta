@@ -13,5 +13,10 @@ interface AgentClient
      *
      * @throws InternalError
      */
-    public function streamAnswer(string $systemPrompt, UserMessage $userMessage, AgentToolCollection $tools): iterable;
+    public function streamAnswer(
+        string $systemPrompt,
+        ConversationTurnCollection $history,
+        UserMessage $userMessage,
+        AgentToolCollection $tools
+    ): iterable;
 }

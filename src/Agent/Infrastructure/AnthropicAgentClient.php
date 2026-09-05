@@ -8,6 +8,8 @@ use Anthropic\Messages\RawContentBlockDeltaEvent;
 use Anthropic\Messages\TextDelta;
 use Anthropic\Messages\ToolUseBlock;
 use Siesta\Agent\Domain\AgentClient;
+use Siesta\Agent\Domain\ConversationTurn;
+use Siesta\Agent\Domain\ConversationTurnCollection;
 use Siesta\Agent\Domain\Stream\TextChunk;
 use Siesta\Agent\Domain\Stream\ToolInvoked;
 use Siesta\Agent\Domain\Tool\AgentTool;
@@ -31,9 +33,13 @@ class AnthropicAgentClient implements AgentClient
     /**
      * @throws InternalError
      */
-    public function streamAnswer(string $systemPrompt, UserMessage $userMessage, AgentToolCollection $tools): iterable
-    {
-        $messages = [['role' => 'user', 'content' => $userMessage->value()]];
+    public function streamAnswer(
+        string $systemPrompt,
+        ConversationTurnCollection $history,
+        UserMessage $userMessage,
+        AgentToolCollection $tools
+    ): iterable {
+        $messages = $this->messagesFrom($history, $userMessage);
         $toolDefinitions = $this->toolDefinitions($tools);
 
         for ($iteration = 0; $iteration < self::MAX_TOOL_ITERATIONS; $iteration++) {
@@ -84,6 +90,26 @@ class AnthropicAgentClient implements AgentClient
 
             $messages[] = ['role' => 'user', 'content' => $toolResults];
         }
+    }
+
+    /**
+     * Previous turns are replayed as plain user/assistant messages: only the final text of
+     * each answer is stored, so the tool calls of past turns are not part of the history.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private function messagesFrom(ConversationTurnCollection $history, UserMessage $userMessage): array
+    {
+        $messages = [];
+        foreach ($history as $turn) {
+            /** @var ConversationTurn $turn */
+            $messages[] = ['role' => 'user', 'content' => $turn->userMessage->value()];
+            $messages[] = ['role' => 'assistant', 'content' => $turn->agentResponse];
+        }
+
+        $messages[] = ['role' => 'user', 'content' => $userMessage->value()];
+
+        return $messages;
     }
 
     /**

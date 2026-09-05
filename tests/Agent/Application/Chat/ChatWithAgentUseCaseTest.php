@@ -8,6 +8,8 @@ use PHPUnit\Framework\TestCase;
 use Siesta\Agent\Application\Chat\ChatWithAgentRequest;
 use Siesta\Agent\Application\Chat\ChatWithAgentUseCase;
 use Siesta\Agent\Domain\AgentClient;
+use Siesta\Agent\Domain\ConversationTurn;
+use Siesta\Agent\Domain\ConversationTurnCollection;
 use Siesta\Agent\Domain\Interaction\InteractionStatus;
 use Siesta\Agent\Domain\MovieCatalog;
 use Siesta\Agent\Domain\RatedMovie;
@@ -68,6 +70,7 @@ class ChatWithAgentUseCaseTest extends TestCase
                         && str_contains($systemPrompt, 'Titane')
                         && str_contains($systemPrompt, 'rating: 2/5');
                 }),
+                self::anything(),
                 self::callback(fn (UserMessage $message): bool => $message->value() === '¿qué me recomiendas?'),
                 self::anything()
             )
@@ -93,6 +96,7 @@ class ChatWithAgentUseCaseTest extends TestCase
                         && str_contains($systemPrompt, '(2026)');
                 }),
                 self::anything(),
+                self::anything(),
                 self::anything()
             )
             ->willReturn([new TextChunk('Va sobre...')]);
@@ -112,6 +116,7 @@ class ChatWithAgentUseCaseTest extends TestCase
             ->method('streamAnswer')
             ->with(
                 self::callback(fn (string $systemPrompt): bool => str_contains($systemPrompt, 'Sin historial todavía.')),
+                self::anything(),
                 self::anything(),
                 self::anything()
             )
@@ -234,6 +239,49 @@ class ChatWithAgentUseCaseTest extends TestCase
 
         self::assertInstanceOf(UnknownTitlesDetected::class, $events[count($events) - 1]);
         self::assertEquals(['Inventada'], $this->agentInteractionRepository->last()->unknownTitles());
+    }
+
+    #[Test]
+    public function whenTheConversationHasPreviousTurnsThenTheyAreSentToTheAgent(): void
+    {
+        $this->userProfileRepository->method('getByUserId')
+            ->willReturn(new UserProfile(new RatedMovieCollection([])));
+        $this->agentInteractionRepository->history = new ConversationTurnCollection([
+            new ConversationTurn(new UserMessage('¿qué me recomiendas?'), 'Mira «Titane»'),
+        ]);
+
+        $this->agentClient->expects(self::once())
+            ->method('streamAnswer')
+            ->with(
+                self::anything(),
+                self::callback(function (ConversationTurnCollection $history): bool {
+                    $turn = $history->items()[0];
+
+                    return $history->count() === 1
+                        && $turn->userMessage->value() === '¿qué me recomiendas?'
+                        && $turn->agentResponse === 'Mira «Titane»';
+                }),
+                self::anything(),
+                self::anything()
+            )
+            ->willReturn([new TextChunk('Dura 108 minutos.')]);
+
+        $this->textOf($this->useCase->execute($this->request('¿cuánto dura?', null, null)));
+    }
+
+    #[Test]
+    public function shouldAskForTheHistoryOfThatConversationAndThatUserOnly(): void
+    {
+        $this->userProfileRepository->method('getByUserId')
+            ->willReturn(new UserProfile(new RatedMovieCollection([])));
+        $this->agentClient->method('streamAnswer')->willReturn([]);
+
+        $this->textOf($this->useCase->execute($this->request('hola', null, null)));
+
+        self::assertEquals(
+            ['userId' => '1', 'conversationId' => 'conversation-1', 'maxTurns' => 10],
+            $this->agentInteractionRepository->historyQuery
+        );
     }
 
     private function useCaseWithCommunications(bool $communicationsEnabled): ChatWithAgentUseCase
