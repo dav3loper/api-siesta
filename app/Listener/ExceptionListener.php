@@ -2,6 +2,7 @@
 
 namespace Siesta\App\Listener;
 
+use Siesta\Agent\Domain\RateLimitExceeded;
 use Siesta\Shared\Exception\DataNotFound;
 use Siesta\Shared\Exception\InternalError;
 use Siesta\Shared\Exception\ValueNotValid;
@@ -39,6 +40,9 @@ class ExceptionListener
         if ($e instanceof DataNotFound) {
             return Response::HTTP_NOT_FOUND;
         }
+        if ($e instanceof RateLimitExceeded) {
+            return Response::HTTP_TOO_MANY_REQUESTS;
+        }
         return Response::HTTP_INTERNAL_SERVER_ERROR;
     }
 
@@ -56,6 +60,10 @@ class ExceptionListener
 
         if ($e instanceof DataNotFound) {
             return 'resource.not.found';
+        }
+
+        if ($e instanceof RateLimitExceeded) {
+            return 'rate.limit.exceeded';
         }
 
         return 'internal.server.error';

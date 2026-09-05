@@ -66,4 +66,5 @@ services:
     Siesta\Agent\Application\Chat\ChatWithAgentUseCase:
         arguments:
             $communicationsEnabled: '%env(bool:AGENT_COMMUNICATIONS_ENABLED)%'
+            $model: '%env(ANTHROPIC_MODEL)%'
 
