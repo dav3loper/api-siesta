@@ -7,8 +7,8 @@ use Siesta\Agent\Domain\Background\MovieBackgroundFinder;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
- * A miss costs three calls to TMDB (search, detail with credits, filmography of the director),
- * which is why the answer is cached before being handed to the agent.
+ * A miss costs four calls to TMDB (search, detail with credits, filmography of the director
+ * and awards), which is why the answer is cached before being handed to the agent.
  */
 class TmdbMovieBackgroundFinder implements MovieBackgroundFinder
 {
@@ -21,6 +21,7 @@ class TmdbMovieBackgroundFinder implements MovieBackgroundFinder
 
     public function __construct(
         private readonly HttpClientInterface $httpClient,
+        private readonly TmdbAwardsFinder $awardsFinder,
         private readonly string $readAccessToken,
     )
     {
@@ -37,15 +38,32 @@ class TmdbMovieBackgroundFinder implements MovieBackgroundFinder
         $directors = $this->directorsOf($movie['credits']['crew'] ?? []);
 
         return new MovieBackground(
-            // The catalog of the festival uses original titles, not the Spanish ones.
-            $movie['original_title'] ?? $movie['title'] ?? $title,
+            $this->titleOf($movie, $title),
             $this->yearOf($movie['release_date'] ?? null),
             $directors === [] ? null : implode(', ', array_column($directors, 'name')),
             array_column($movie['genres'] ?? [], 'name'),
             $this->mainCast($movie['credits']['cast'] ?? []),
             $directors === [] ? [] : $this->otherMoviesDirectedBy((int)$directors[0]['id'], (int)$movie['id']),
+            $this->awardsFinder->findByMovieId((int)$movie['id']),
             $this->audienceScoreOf($movie),
+            (int)($movie['vote_count'] ?? 0),
         );
+    }
+
+    /**
+     * The festival programs original titles, so they beat the Spanish ones, but only while
+     * they are readable here: a Korean premiere is programmed under its international title.
+     *
+     * @param array<string, mixed> $movie
+     */
+    private function titleOf(array $movie, string $searchedTitle): string
+    {
+        $originalTitle = $movie['original_title'] ?? '';
+        if ($originalTitle !== '' && !preg_match('/[^\p{Latin}\p{Common}]/u', $originalTitle)) {
+            return $originalTitle;
+        }
+
+        return $movie['title'] ?? $searchedTitle;
     }
 
     /**

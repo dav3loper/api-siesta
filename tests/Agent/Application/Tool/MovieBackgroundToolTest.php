@@ -48,7 +48,8 @@ class MovieBackgroundToolTest extends TestCase
         self::assertStringContainsString('Crudo (2016)', $result);
         self::assertStringContainsString('Agathe Rousselle', $result);
         self::assertStringContainsString('Terror', $result);
-        self::assertStringContainsString('7/10', $result);
+        self::assertStringContainsString('Ganador: Palma de Oro', $result);
+        self::assertStringContainsString('7/10 (4213 votos)', $result);
     }
 
     #[Test]
@@ -94,7 +95,7 @@ class MovieBackgroundToolTest extends TestCase
     public function whenTheSourceOnlyKnowsTheTitleThenOmitsTheMissingFields(): void
     {
         $this->movieBackgroundRepository->method('findBySearchedTitle')
-            ->willReturn(new MovieBackground('Estreno Inédito', null, null, [], [], [], null));
+            ->willReturn(new MovieBackground('Estreno Inédito', null, null, [], [], [], [], null, 0));
 
         $result = $this->tool->execute(['title' => 'Estreno Inédito']);
 
@@ -110,7 +111,9 @@ class MovieBackgroundToolTest extends TestCase
             ['Terror', 'Drama'],
             ['Agathe Rousselle', 'Vincent Lindon'],
             ['Crudo (2016)'],
+            ['Ganador: Palma de Oro (Festival de Cannes 2021)'],
             7.0,
+            4213,
         );
     }
 }

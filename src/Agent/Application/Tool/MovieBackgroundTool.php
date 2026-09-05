@@ -24,8 +24,9 @@ class MovieBackgroundTool implements AgentTool
     public function description(): string
     {
         return 'Da información de una película más allá de su sinopsis: quién la dirige, qué otras '
-            . 'películas ha dirigido, reparto principal, géneros y valoración media del público. '
-            . 'Úsala cuando el usuario pregunte por el director, el reparto o a qué se parece una película. '
+            . 'películas ha dirigido, reparto principal, géneros, premios y nominaciones que ha '
+            . 'recibido, y valoración media del público. Úsala cuando el usuario pregunte por el '
+            . 'director, el reparto, los premios o a qué se parece una película. '
             . 'Los datos vienen de una base externa, así que puede no haber nada de un estreno muy reciente: '
             . 'en ese caso dilo, no lo supongas.';
     }
@@ -87,8 +88,14 @@ class MovieBackgroundTool implements AgentTool
         if ($background->genres !== []) {
             $lines[] = 'Géneros: ' . implode(', ', $background->genres);
         }
+        if ($background->awards !== []) {
+            $lines[] = 'Premios y nominaciones: ' . implode('; ', $background->awards);
+        }
         if ($background->audienceScore !== null) {
-            $lines[] = "Valoración media del público: {$background->audienceScore}/10";
+            // The number of votes goes with the score on purpose: an 8 out of four votes on a
+            // premiere nobody has seen yet is not the same thing as an 8 out of five thousand.
+            $lines[] = "Valoración media del público: {$background->audienceScore}/10"
+                . " ({$background->audienceVotes} votos)";
         }
 
         return implode("\n", $lines);
