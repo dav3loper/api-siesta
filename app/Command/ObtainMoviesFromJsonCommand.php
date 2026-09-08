@@ -14,6 +14,7 @@ class ObtainMoviesFromJsonCommand extends Command
 {
 
     private const HOST = 'https://sitgesfilmfestival.com/';
+    private const NO_TRAILER = 'notrailer';
 
     public function __construct(
         private readonly MovieRepository    $movieRepository,
@@ -71,7 +72,7 @@ class ObtainMoviesFromJsonCommand extends Command
             $movieList[] = new Movie(
                 $movieData['international_title'],
                 $movieData['image'],
-                $this->getTrailer($titleForTrailer),
+                $this->movieRepository->alreadyHasTrailer($movieData['international_title']) ? self::NO_TRAILER : $this->getTrailer($titleForTrailer),
                 $movieData['duration'],
                 html_entity_decode($movieData['synopsis']['es']),
                 self::HOST . $movieData['url']['es'],
@@ -104,7 +105,7 @@ class ObtainMoviesFromJsonCommand extends Command
             return $result;
         } catch (\Throwable $e) {
             echo $e->getMessage();
-            return 'notrailer';
+            return self::NO_TRAILER;
         }
 
     }

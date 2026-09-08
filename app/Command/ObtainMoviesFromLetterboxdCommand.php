@@ -45,8 +45,11 @@ class ObtainMoviesFromLetterboxdCommand extends Command
         $entries = $this->movieListFinder->findAll($input->getArgument('url'));
 
         foreach ($entries as $index => $entry) {
-            $trailer = $this->finderVideoService->findByText("$entry->title official trailer");
-            if ($index === 0 && $stopOnFirstTrailerFailure && $trailer === self::NO_TRAILER) {
+            $alreadyHasTrailer = $this->movieRepository->alreadyHasTrailer($entry->title);
+            $trailer = $alreadyHasTrailer
+                ? self::NO_TRAILER
+                : $this->finderVideoService->findByText("$entry->title official trailer");
+            if (!$alreadyHasTrailer && $index === 0 && $stopOnFirstTrailerFailure && $trailer === self::NO_TRAILER) {
                 $output->writeln("Trailer search failed for the first movie ($entry->title), aborting");
                 return self::FAILURE;
             }

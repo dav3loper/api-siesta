@@ -76,6 +76,18 @@ class DoctrineMovieRepository implements MovieRepository
         return (bool)$existing['trailer_locked'] || $movie->trailer_id === self::NO_TRAILER;
     }
 
+    public function alreadyHasTrailer(string $title): bool
+    {
+        $trailerId = $this->connection->createQueryBuilder()
+            ->select('trailer_id')
+            ->from(self::TABLE)
+            ->where('title = :title')
+            ->setParameter('title', $title)
+            ->fetchOne();
+
+        return $trailerId !== false && $trailerId !== self::NO_TRAILER;
+    }
+
     private function replaceSessions(int $movieId, array $sessions): void
     {
         $this->connection->delete(self::SESSIONS_TABLE, ['movie_id' => $movieId]);
