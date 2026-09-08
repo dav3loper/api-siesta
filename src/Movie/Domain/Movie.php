@@ -14,8 +14,8 @@ class Movie implements \JsonSerializable
     public function __construct(
         public readonly Id      $id,
         public readonly string  $title,
-        public readonly string  $poster,
-        public readonly string  $trailer_id,
+        public readonly ?string $poster,
+        public readonly ?string $trailer_id,
         public readonly int     $duration,
         public readonly string  $summary,
         public readonly ?string $link,
@@ -23,7 +23,9 @@ class Movie implements \JsonSerializable
         public readonly int     $film_festival_id,
         public readonly ?string $alias,
         public readonly ?string $section,
-        public readonly array   $sessions
+        public readonly array   $sessions,
+        public readonly bool    $poster_locked,
+        public readonly bool    $trailer_locked
     )
     {
         $this->voteCollection = new VoteCollection([]);
@@ -37,6 +39,44 @@ class Movie implements \JsonSerializable
     public function getVoteCollection(): VoteCollection
     {
         return $this->voteCollection;
+    }
+
+    /**
+     * A poster can be wrong (the importer matched the wrong film), so it can be replaced or
+     * cleared without touching the rest of the movie. A poster chosen by a person is locked:
+     * from then on the importer is not allowed to overwrite it.
+     */
+    public function withPoster(?string $poster): Movie
+    {
+        return $this->copyWithMedia($poster, true, $this->trailer_id, $this->trailer_locked);
+    }
+
+    public function withTrailer(?string $trailerId): Movie
+    {
+        return $this->copyWithMedia($this->poster, $this->poster_locked, $trailerId, true);
+    }
+
+    private function copyWithMedia(?string $poster, bool $posterLocked, ?string $trailerId, bool $trailerLocked): Movie
+    {
+        $movie = new Movie(
+            $this->id,
+            $this->title,
+            $poster,
+            $trailerId,
+            $this->duration,
+            $this->summary,
+            $this->link,
+            $this->comments,
+            $this->film_festival_id,
+            $this->alias,
+            $this->section,
+            $this->sessions,
+            $posterLocked,
+            $trailerLocked
+        );
+        $movie->setVoteCollection($this->voteCollection);
+
+        return $movie;
     }
 
 

@@ -23,6 +23,8 @@ class MovieMother extends Mother
     private ?string $section;
     /** @var Session[] */
     private array $sessions;
+    private bool $poster_locked;
+    private bool $trailer_locked;
 
     public static function create(): MovieMother
     {
@@ -45,6 +47,8 @@ class MovieMother extends Mother
         $this->sessions = [
             new Session($this->faker->city, new Date('now'), new Date('+2 hours'), $this->faker->word),
         ];
+        $this->poster_locked = false;
+        $this->trailer_locked = false;
 
         return $this;
 
@@ -65,6 +69,8 @@ class MovieMother extends Mother
             $this->alias,
             $this->section,
             $this->sessions,
+            $this->poster_locked,
+            $this->trailer_locked,
         );
     }
 }

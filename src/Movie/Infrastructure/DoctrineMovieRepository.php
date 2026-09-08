@@ -66,7 +66,9 @@ class DoctrineMovieRepository implements MovieRepository
             (int)$data['film_festival_id'],
             $data['alias'],
             $data['section'],
-            $sessionList
+            $sessionList,
+            (bool)$data['poster_locked'],
+            (bool)$data['trailer_locked']
         );
 
     }
@@ -122,6 +124,26 @@ class DoctrineMovieRepository implements MovieRepository
         }
 
         return $movieList;
+    }
+
+    /**
+     * @throws InternalError
+     */
+    public function updateMedia(Movie $movie): void
+    {
+        try {
+            $this->connection->update('movie', [
+                'poster' => $movie->poster,
+                'trailer_id' => $movie->trailer_id,
+                'poster_locked' => $movie->poster_locked,
+                'trailer_locked' => $movie->trailer_locked,
+                'updated_at' => new Date('now')
+            ], [
+                'id' => $movie->id->id
+            ]);
+        } catch (Throwable $e) {
+            throw new InternalError($e->getMessage());
+        }
     }
 
     private function getVotesForMovie(Id $id, int $groupId): VoteCollection

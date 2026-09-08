@@ -18,4 +18,9 @@ interface MovieRepository
     public function getNextMovie(Id $movieId, Id $filmFestivalId): Movie;
 
     public function getAllByFilmFestivalId(int $filmFestivalId, int $groupId);
+
+    /**
+     * @throws InternalError
+     */
+    public function updateMedia(Movie $movie): void;
 }
