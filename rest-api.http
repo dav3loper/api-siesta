@@ -83,3 +83,23 @@ Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMjEiL
 {
   "message": ""
 }
+
+### Clear a wrong trailer of a movie
+PATCH http://localhost:8080/movie/1/media
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMjEiLCJ1c2VyX25hbWUiOiJEYXZlIiwiZ3JvdXBfaWQiOiIxIiwiZ3JvdXBfbmFtZSI6IlRvbCBHcml0byJ9.Q2RMEFhaqAsSHjJhrcbc22eBSOGbms7D_V-LK34AvZ4
+
+{
+  "trailer": null
+}
+
+### Replace the poster of a movie, the trailer stays as it is
+PATCH http://localhost:8080/movie/1/media
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMjEiLCJ1c2VyX25hbWUiOiJEYXZlIiwiZ3JvdXBfaWQiOiIxIiwiZ3JvdXBfbmFtZSI6IlRvbCBHcml0byJ9.Q2RMEFhaqAsSHjJhrcbc22eBSOGbms7D_V-LK34AvZ4
+
+{
+  "poster": "https://image.tmdb.org/t/p/w500/right-poster.jpg"
+}

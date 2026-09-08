@@ -3,6 +3,11 @@ get-movie:
     controller: Siesta\App\Action\Movie\GetMovieByIdAction
     methods: GET
 
+update-movie-media:
+    path: /movie/{movieId}/media
+    controller: Siesta\App\Action\Movie\UpdateMovieMediaAction
+    methods: PATCH
+
 get-votes-for-movie:
     path: /movie/{movieId}/votes
     controller: Siesta\App\Action\Vote\GetVotesForMovieAction
