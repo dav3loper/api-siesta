@@ -8,6 +8,11 @@ update-movie-media:
     controller: Siesta\App\Action\Movie\UpdateMovieMediaAction
     methods: PATCH
 
+update-movie-alias:
+    path: /movie/{movieId}/alias
+    controller: Siesta\App\Action\Movie\UpdateMovieAliasAction
+    methods: PATCH
+
 get-votes-for-movie:
     path: /movie/{movieId}/votes
     controller: Siesta\App\Action\Vote\GetVotesForMovieAction

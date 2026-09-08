@@ -23,4 +23,9 @@ interface MovieRepository
      * @throws InternalError
      */
     public function updateMedia(Movie $movie): void;
+
+    /**
+     * @throws InternalError
+     */
+    public function updateAlias(Movie $movie): void;
 }

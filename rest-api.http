@@ -103,3 +103,23 @@ Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMjEiL
 {
   "poster": "https://image.tmdb.org/t/p/w500/right-poster.jpg"
 }
+
+### Name a movie the way the group calls it
+PATCH http://localhost:8080/movie/1/alias
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMjEiLCJ1c2VyX25hbWUiOiJEYXZlIiwiZ3JvdXBfaWQiOiIxIiwiZ3JvdXBfbmFtZSI6IlRvbCBHcml0byJ9.Q2RMEFhaqAsSHjJhrcbc22eBSOGbms7D_V-LK34AvZ4
+
+{
+  "alias": "La de los pingüinos"
+}
+
+### Clear the alias of a movie, it goes back to being known by its title
+PATCH http://localhost:8080/movie/1/alias
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMjEiLCJ1c2VyX25hbWUiOiJEYXZlIiwiZ3JvdXBfaWQiOiIxIiwiZ3JvdXBfbmFtZSI6IlRvbCBHcml0byJ9.Q2RMEFhaqAsSHjJhrcbc22eBSOGbms7D_V-LK34AvZ4
+
+{
+  "alias": null
+}

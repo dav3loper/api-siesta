@@ -146,6 +146,23 @@ class DoctrineMovieRepository implements MovieRepository
         }
     }
 
+    /**
+     * @throws InternalError
+     */
+    public function updateAlias(Movie $movie): void
+    {
+        try {
+            $this->connection->update('movie', [
+                'alias' => $movie->alias,
+                'updated_at' => new Date('now')
+            ], [
+                'id' => $movie->id->id
+            ]);
+        } catch (Throwable $e) {
+            throw new InternalError($e->getMessage());
+        }
+    }
+
     private function getVotesForMovie(Id $id, int $groupId): VoteCollection
     {
         try {

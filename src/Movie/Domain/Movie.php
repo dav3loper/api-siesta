@@ -48,15 +48,24 @@ class Movie implements \JsonSerializable
      */
     public function withPoster(?string $poster): Movie
     {
-        return $this->copyWithMedia($poster, true, $this->trailer_id, $this->trailer_locked);
+        return $this->copyWith($poster, true, $this->trailer_id, $this->trailer_locked, $this->alias);
     }
 
     public function withTrailer(?string $trailerId): Movie
     {
-        return $this->copyWithMedia($this->poster, $this->poster_locked, $trailerId, true);
+        return $this->copyWith($this->poster, $this->poster_locked, $trailerId, true, $this->alias);
     }
 
-    private function copyWithMedia(?string $poster, bool $posterLocked, ?string $trailerId, bool $trailerLocked): Movie
+    /**
+     * The alias is the name the group actually uses for a film, so a person writes it and rewrites
+     * it as many times as needed; a null alias means the movie goes back to being known by its title.
+     */
+    public function withAlias(?string $alias): Movie
+    {
+        return $this->copyWith($this->poster, $this->poster_locked, $this->trailer_id, $this->trailer_locked, $alias);
+    }
+
+    private function copyWith(?string $poster, bool $posterLocked, ?string $trailerId, bool $trailerLocked, ?string $alias): Movie
     {
         $movie = new Movie(
             $this->id,
@@ -68,7 +77,7 @@ class Movie implements \JsonSerializable
             $this->link,
             $this->comments,
             $this->film_festival_id,
-            $this->alias,
+            $alias,
             $this->section,
             $this->sessions,
             $posterLocked,
